@@ -518,7 +518,8 @@
     $('#menuBtn').setAttribute('aria-expanded', open);
     $('#menuBtn').setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
     view.inert = open;                 // menü açıkken arkadaki sayfaya odak gitmesin
-    if (open) search.focus({ preventScroll: true });
+    // odağı arama kutusuna değil menüye ver: telefonda ekran klavyesi açılmasın
+    if (open) ($('.nav [aria-current]') || sidebar).focus({ preventScroll: true });
     else if (sidebar.contains(document.activeElement) || document.activeElement === document.body) $('#menuBtn').focus();
   }
   $('#menuBtn').onclick = () => toggleMenu(!document.body.classList.contains('menu-open'));

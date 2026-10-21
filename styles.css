@@ -565,3 +565,4 @@ body.quick .content h2 { margin-top: 40px; }
 /* ERD: taşınan (üstü çizili) ve sorunlu / yeni yerindeki (kırmızı) attribute */
 .erd-attr.erd-struck { text-decoration: line-through; fill: var(--muted); }
 .erd-attr.erd-new { fill: var(--red); font-weight: 700; }
+.sidebar:focus { outline: none; }
