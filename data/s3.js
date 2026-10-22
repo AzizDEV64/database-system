@@ -18,7 +18,7 @@ ERDS.erdish = {
     { id: 'dept', name: 'DEPARTMENT', x: 340, y: 20, w: 140, minH: 50 },
   ],
   rels: [
-    { a: { e: 'emp', side: 'r', must: true, many: true, label: 'works in' }, b: { e: 'dept', side: 'l', must: false, label: 'responsible for', ly: 63 } },
+    { a: { e: 'emp', side: 'r', must: true, many: true, label: 'work in' }, b: { e: 'dept', side: 'l', must: false, label: 'responsible for', ly: 63 } },
   ],
 };
 
@@ -49,7 +49,7 @@ SECTIONS.push({
   no: 3,
   title: 'İlişkiler ve ERD çizimi',
   en: 'Relationships and ER Diagramming',
-  desc: 'Optionality ve cardinality, ERD çizim kuralları, ilişkiyi ERDish ile okumak ve matrix diyagramı.',
+  desc: 'Optionality ve cardinality’yi, ERD çizim kurallarını, bir ilişkiyi ERDish ile okumayı ve matrix diyagramını öğreniyorsun.',
   lessons: [
     // ------------------------------------------------------------------ 3-1
     {
@@ -57,35 +57,46 @@ SECTIONS.push({
       title: 'İlişkileri bulmak',
       en: 'Identifying Relationships',
       html: `
-${term(`Relationship`, `İlişki`, `<p>İki entity (ya da bir entity ile kendisi) arasındaki bağlantı; ER’deki “R” budur. Örneğin STUDENT bir BOOK’u ödünç alır. Modelde entity’ler kadar önemlidir.</p>`, {
+${term(`Relationship`, `İlişki`, `<p>İlişki, iki entity arasındaki bağlantıdır; bir STUDENT’ın bir BOOK’u ödünç alması gibi.</p>`, {
   star: true,
   exam: `A connection or association between objects`,
+  more: `<p>ER’deki “R” harfi buradan gelir. Kütüphane örneğinde “ödünç alır”, STUDENT ile BOOK arasındaki ilişkidir. Bir entity kendisiyle de ilişkili olabilir. Modelde ilişkiler en az entity’ler kadar önemlidir.</p>`,
 })}
-<p>İlişkilerin özellikleri:</p>
+<p>İlişkilerin şu özellikleri var:</p>
 <ul>
+  <li>Represent something of significance or importance to the business <i>(işletme için önemli bir şeyi gösterir)</i></li>
+  <li>Show how entities are related to each other <i>(entity’lerin birbirine nasıl bağlı olduğunu gösterir)</i></li>
   <li>Exist only between entities (or one entity and itself) <i>(entity kendisiyle de ilişkili olabilir)</i></li>
   <li>Are bi-directional <i>(iki yönlüdür)</i></li>
   <li>Are named at both ends <i>(iki ucunun da adı vardır)</i></li>
   <li>Have optionality and cardinality</li>
 </ul>
-${term(`Optionality`, `Zorunluluk`, `<p>Sorduğu soru: “must mı, may mi?” Her çalışanın bir işi olmak zorunda mı? Evet, o zaman <b>must</b>. Her iş birine verilmek zorunda mı? Boş kadro olabilir, o zaman <b>may</b>.</p>`, {
+<p>İki entity arasında birden fazla ilişki de olabilir; mesela bir PERSON bir CLASS’a katılabilir (attend), onu verebilir (teach) ya da onun hakkında yazabilir (write).</p>
+${term(`Optionality`, `Zorunluluk`, `<p>Optionality, ilişkinin zorunlu mu yoksa isteğe bağlı mı olduğunu söyler; yani “must mı, may mi?” sorusunun cevabıdır.</p>`, {
   star: true,
   exam: `Relationships are either mandatory or optional`,
+  more: `<p>Mesela her çalışanın bir işi olmak zorunda mı? Evet, o zaman <b>must</b> deriz. Peki her iş birine verilmek zorunda mı? Hayır, boş kadro da olabilir; o zaman <b>may</b> deriz.</p>`,
 })}
-${term(`Cardinality`, `Kaç tane`, `<p>Sorduğu soru: “kaç tane?” Cevap ya <b>one and only one</b> ya da <b>one or more</b> olur. Kesin bir sayı vermez, sadece tekil mi çoğul mu onu söyler.</p>`, {
+${term(`Cardinality`, `Kaç tane`, `<p>Cardinality, ilişkinin öbür ucunda kaç tane instance olabileceğini söyler ve cevabı ya <b>one and only one</b> (bir ve yalnızca bir) ya da <b>one or more</b> (bir veya daha çok) olur.</p>`, {
   star: true,
   exam: `Only answers whether the number is singular or plural <i>(tekil mi, çoğul mu)</i>`,
+  more: `<p>Yani cardinality “kaç tane?” sorusunun cevabıdır. Kesin bir sayı vermez; sadece tekil mi çoğul mu, onu söyler.</p>`,
 })}
-${mix('Optionality ve cardinality', `Optionality → <b>must / may</b> (zorunlu mu?). Cardinality → <b>one / one or more</b> (kaç tane?).`)}
+${mix('Optionality ve cardinality', `Optionality <b>must / may</b> sorusunu cevaplar, yani ilişkinin zorunlu olup olmadığına bakar. Cardinality ise <b>one / one or more</b> sorusunu cevaplar, yani kaç tane olduğuna bakar.`)}
 
 ${h2('İlişki cümleleri')}
-${say(`Each EMPLOYEE <b>must</b> hold <b>one and only one</b> JOB.`, `Her çalışanın tam olarak bir işi olmalı.`)}
-${say(`Each JOB <b>may</b> be held by <b>one or more</b> EMPLOYEEs.`, `Bir iş bir veya daha çok çalışana verilebilir.`)}
-${say(`Each CUSTOMER <b>must</b> place <b>one or more</b> ORDERs.`, `Restoranda müşteri en az bir sipariş verir.`)}
-${say(`Each ORDER <b>must</b> be placed by <b>one and only one</b> CUSTOMER.`, `Her siparişin tek bir sahibi vardır.`)}
+${say(`Each EMPLOYEE <b>must</b> hold <b>one and only one</b> JOB.`, `Her çalışanın tam olarak bir işi olmak zorunda.`)}
+${say(`Each JOB <b>may</b> be held by <b>one or more</b> EMPLOYEEs.`, `Bir iş bir ya da daha çok çalışana verilebilir, ama boşta da kalabilir.`)}
+${say(`Each PRODUCT <b>must</b> be classified by <b>one and only one</b> PRODUCT TYPE.`, `Her ürün tam olarak bir ürün türüne ait olmak zorunda.`)}
+${say(`Each PRODUCT TYPE <b>may</b> classify <b>one or more</b> PRODUCTs.`, `Bir ürün türünde bir ya da daha çok ürün olabilir, ama hiç ürün olmayabilir de.`)}
+${more(`<p>Cümle daha rahat okunsun diye ikinci entity’nin adının sonuna küçük bir “s” eklenir; PRODUCTs, EMPLOYEEs gibi.</p>`)}
+${say(`Each CUSTOMER <b>must</b> place <b>one or more</b> ORDERs.`, `Restoranda her müşteri en az bir sipariş vermek zorundadır. Bir anne kendisi ve çocukları için sipariş verse bile siparişin sahibi ve parasını ödeyen müşteri annedir.`)}
+${say(`Each ORDER <b>must</b> be placed by <b>one and only one</b> CUSTOMER.`, `Her siparişi tek bir müşteri verir, yani siparişin tek bir sahibi vardır.`)}
 ${say(`Each EMPLOYEE <b>may</b> be managed by <b>one and only one</b> EMPLOYEE.`, `Bir çalışanın en fazla bir yöneticisi olabilir. Yönetici de bir EMPLOYEE olduğu için ilişki entity’nin kendisine döner.`)}
 ${say(`Each EMPLOYEE <b>may</b> manage <b>one or more</b> EMPLOYEEs.`, `Bir yönetici birden çok çalışanı yönetebilir.`)}
-${note(`Cevaplar işletmenin kurallarına (business rules) göre değişir. Örneğin havayolu bir koltuğu birden çok yolcuya satabilir (overbooking).`)}
+${say(`Each SEAT <b>may</b> be sold to <b>one or more</b> PASSENGERs.`, `Bir koltuk hiç satılmayabilir, ama birden çok yolcuya da satılabilir; buna overbooking denir.`)}
+${say(`Each PASSENGER <b>may</b> purchase <b>one</b> SEAT.`, `Bir yolcu bir koltuk satın alabilir.`)}
+${note(`Bu soruların cevabı işletmenin kurallarına (business rules) göre değişir. Mesela bir havayolu şirketi aynı koltuğu birden çok yolcuya satabilir, başka bir şirket ise satmayabilir.`)}
 `,
     },
 
@@ -95,35 +106,39 @@ ${note(`Cevaplar işletmenin kurallarına (business rules) göre değişir. Örn
       title: 'ERD çizim kuralları',
       en: 'ER Diagramming Conventions',
       html: `
-${term(`ER Diagramming`, `ERD çizimi`, `<p>ERD’yi herkesin aynı şekilde okuyacağı ortak kurallarla (convention) çizmek, tıpkı trafik işaretleri gibi.</p>`, {
+${term(`ER Diagramming`, `ERD çizimi`, `<p>ERD’yi herkesin aynı şekilde okuyabilmesi için ortak kurallarla (convention) çizeriz.</p>`, {
   exam: `Everyone draws ER diagrams according to the same conventions`,
+  more: `<p>Trafik işaretleri gibi düşün: herkes aynı işareti kullandığı için kimsenin ayrıca açıklama istemesine gerek kalmaz.</p>`,
 })}
-${term(`Softbox`, `Yuvarlak köşeli kutu`, `<p>Entity bu kutuyla çizilir. Adı kutunun içine, tekil ve büyük harfle yazılır: EMPLOYEES değil, EMPLOYEE.</p>`, {
+${term(`Softbox`, `Yuvarlak köşeli kutu`, `<p>Softbox, köşeleri yuvarlatılmış kutudur ve ERD’de her entity bununla çizilir.</p>`, {
   star: true,
   exam: `Entity names are always singular and written with all capital letters`,
+  more: `<p>Entity’nin adı kutunun içine tekil ve tamamen büyük harfle yazılır; yani EMPLOYEES değil, EMPLOYEE.</p>`,
 })}
 
 ${h2('Attribute işaretleri')}
 ${table(['İşaret', 'Anlamı'], [
-  ['<code>#</code>', 'Unique identifier (UID)'],
-  ['<code>*</code>', 'Mandatory (zorunlu)'],
-  ['<code>o</code>', 'Optional (isteğe bağlı)'],
+  ['<code>#</code>', 'Unique identifier (UID), yani her instance’ı birbirinden ayıran attribute'],
+  ['<code>*</code>', 'Mandatory, yani değeri mutlaka girilmesi gereken (zorunlu) attribute'],
+  ['<code>o</code>', 'Optional, yani boş bırakılabilen (isteğe bağlı) attribute'],
 ])}
-${note(`UID’nin parçası olan attribute zaten zorunludur, bu yüzden önüne sadece <code>#</code> konur, <code>*</code> konmaz.`)}
-${erd('conv', 'Slayttaki örnek: attribute’lar entity adının altında listelenir.')}
+${note(`UID’nin parçası olan bir attribute zaten zorunludur. Bu yüzden önüne sadece <code>#</code> konur, ayrıca <code>*</code> konmaz.`)}
+${erd('conv', 'Her entity’nin attribute’ları, kutunun içinde entity adının altına sıralanır.', `Kutuların içindeki satırların başına bak: <code>#</code> ile başlayan satır UID, <code>*</code> ile başlayan zorunlu, <code>o</code> ile başlayan isteğe bağlı bir attribute. Mesela EMPLOYEE’deki Commission’ın başında <code>o</code> var, yani her çalışanın komisyonu olmak zorunda değil. Kutuları birleştiren çizgilerin anlamını hemen aşağıda göreceksin.`)}
 
 ${h2('İlişki çizgileri')}
+<p>Bir ilişki çizgisinde iki şeye bakarsın. Çizginin kendisi düz mü kesikli mi, ona bakınca optionality’yi (must / may) anlarsın. Çizginin entity’ye değdiği uç çatallı mı değil mi, ona bakınca da cardinality’yi (one / one or more) anlarsın.</p>
 <div class="legend-erd">
-  <div>${lineSample('solid')}<p><strong>Düz çizgi</strong><span>must (zorunlu)</span></p></div>
-  <div>${lineSample('dash')}<p><strong>Kesikli çizgi</strong><span>may (isteğe bağlı)</span></p></div>
-  <div>${lineSample('toe')}<p><strong>Single toe</strong><span>one and only one (uçta çatal yok)</span></p></div>
-  <div>${lineSample('foot')}<p><strong>Crow’s foot</strong><span>one or more</span></p></div>
+  <div>${lineSample('solid')}<p><strong>Düz çizgi</strong><span>must, yani ilişki zorunlu</span></p></div>
+  <div>${lineSample('dash')}<p><strong>Kesikli çizgi</strong><span>may, yani ilişki isteğe bağlı</span></p></div>
+  <div>${lineSample('toe')}<p><strong>Single toe</strong><span>one and only one; uç çatalsız biter</span></p></div>
+  <div>${lineSample('foot')}<p><strong>Crow’s foot</strong><span>one or more, yani bir veya daha çok</span></p></div>
 </div>
-${term(`Crow’s Foot`, `Karga ayağı`, `<p>Çizginin entity’ye değdiği uçtaki üç çatallı işaret. O entity’den “bir veya daha çok” olabileceğini gösterir.</p>`, {
+${term(`Crow’s Foot`, `Karga ayağı`, `<p>Crow’s foot, çizginin entity’ye değdiği uçtaki üç çatallı işarettir ve o uçtaki entity’den “bir veya daha çok” instance olabileceğini gösterir.</p>`, {
   star: true,
   exam: `Lines terminate in either a "single toe" or a "crow's foot" <i>(terminate = biter)</i>`,
+  more: `<p>Karga ayağına benzediği için bu adı almış.</p>`,
 })}
-${term(`Single Toe`, `Tek uç`, `<p>Çatalsız, düz biten uç. O entity’den “bir ve yalnızca bir” olduğunu gösterir.</p>`)}
+${term(`Single Toe`, `Tek uç`, `<p>Single toe, çizginin çatalsız, düz bittiği uçtur ve o uçtaki entity’den “bir ve yalnızca bir” instance olduğunu gösterir.</p>`)}
 `,
     },
 
@@ -133,9 +148,10 @@ ${term(`Single Toe`, `Tek uç`, `<p>Çatalsız, düz biten uç. O entity’den �
       title: 'ERDish konuşmak ve ilişki çizmek',
       en: 'Speaking ERDish & Drawing Relationships',
       html: `
-${term(`ERDish`, `ERD dili`, `<p>ERD’deki ilişkiyi kalıplı bir İngilizce cümleyle söylemek. Müşteriyle konuşurken de, tasarımı DBA’ya anlatırken de ortak dil olur.</p>`, {
+${term(`ERDish`, `ERD dili`, `<p>ERDish, ERD’deki bir ilişkiyi kalıplı bir İngilizce cümleyle söylemektir.</p>`, {
   star: true,
   exam: `The vocabulary used to clearly communicate the business rules that are captured on an ERD`,
+  more: `<p>Böylece hem müşteriyle konuşurken hem de tasarımı DBA’ya (veritabanı yöneticisine) anlatırken herkes aynı dili kullanır.</p>`,
 })}
 
 ${h2('Cümlenin 6 parçası')}
@@ -149,11 +165,11 @@ ${h2('Cümlenin 6 parçası')}
 </ol>
 
 ${h2('Bir ilişki, iki cümle')}
-${erd('erdish')}
-${say(`Each EMPLOYEE <b>must</b> work in <b>one and only one</b> DEPARTMENT.`, `Soldan sağa: EMPLOYEE tarafı düz → must; DEPARTMENT ucu single toe → one and only one.`)}
-${say(`Each DEPARTMENT <b>may</b> be responsible for <b>one or more</b> EMPLOYEEs.`, `Sağdan sola: DEPARTMENT tarafı kesikli → may; EMPLOYEE ucu crow’s foot → one or more.`)}
-${tip(`<b>Must / may</b> için çizginin, <b>cümleye başladığın entity’nin</b> tarafındaki yarısına bak. <b>Kaç tane</b> için <b>karşı uca</b> bak. İlişki adı da kendi entity’sinin yanına yazılır. Çizgi ve uç işaretlerinin listesi 3-2’de.`, 'Okuma kuralı')}
-${note(`Slayt metninde “MAY BE (solid line)” ve “ONE OR MORE (single toe)” yazıyor; bu bir hata. Slayttaki çizimde de görüldüğü gibi may kesikli çizgidir, one or more ise crow’s foot.`, 'Slayttaki hata')}
+<p>Her ilişkinin iki ucu olduğu için ilk cümleyi soldan sağa (ERD dikey çizilmişse yukarıdan aşağı), ikinci cümleyi de ters yönde okursun.</p>
+${erd('erdish', '', `Çizgiyi tam ortasından ikiye böl: sol yarı EMPLOYEE’ye, sağ yarı DEPARTMENT’a ait. Sol yarının düz, sağ yarının kesikli olduğuna dikkat et. Uçlara da bak: EMPLOYEE ucunda crow’s foot var, DEPARTMENT ucunda ise yok.`)}
+${say(`Each EMPLOYEE <b>must</b> work in <b>one and only one</b> DEPARTMENT.`, `Soldan sağa okuyoruz. EMPLOYEE tarafındaki yarı düz çizgi, o yüzden must. DEPARTMENT ucunda single toe var, o yüzden one and only one.`)}
+${say(`Each DEPARTMENT <b>may</b> be responsible for <b>one or more</b> EMPLOYEEs.`, `Sağdan sola okuyoruz. DEPARTMENT tarafındaki yarı kesikli çizgi, o yüzden may. EMPLOYEE ucunda crow’s foot var, o yüzden one or more.`)}
+${tip(`<b>Must / may</b> kararı için çizginin, <b>cümleye başladığın entity’nin</b> tarafındaki yarısına bak. <b>Kaç tane</b> olduğunu anlamak için ise <b>karşı uçtaki</b> işarete bak. İlişkinin adı da kendi entity’sinin yanına yazılır.`, 'Okuma kuralı')}
 `,
     },
 
@@ -163,25 +179,29 @@ ${note(`Slayt metninde “MAY BE (solid line)” ve “ONE OR MORE (single toe)�
       title: 'Matrix diyagramı',
       en: 'Matrix Diagrams',
       html: `
-${term(`Matrix diagram`, `Matris diyagramı`, `<p>Entity’leri hem satırlara hem sütunlara yazdığın bir tablo. Her hücre “bu ikisi arasında ilişki var mı?” diye sorar. 3 entity’de buna gerek yok ama 13 entity olunca hiçbir ilişkiyi atlamamanı sağlar.</p>`, {
+${term(`Matrix diagram`, `Matris diyagramı`, `<p>Matrix diyagramı, entity’leri hem satırlara hem sütunlara yazdığın ve aralarındaki ilişkileri bulmana yarayan bir tablodur.</p>`, {
   star: true,
   exam: `A grid-like drawing that can be used to discover and record relationships between entities`,
+  more: `<p>Her hücrede “bu iki entity arasında ilişki var mı?” diye kendine sorarsın; varsa ilişkinin adını hücreye yazarsın. 3 entity’de ilişkileri akıldan bulmak kolaydır, ama 13 ya da daha fazla entity olunca bir ilişkiyi gözden kaçırmak çok kolaylaşır.</p>`,
 })}
-<p>Slayttaki örnekte bir seyahat acentesi müşterilerin gezdiği ülkeleri ve gördüğü yerleri (landmark) kaydediyor:</p>
-<div class="table-wrap"><table class="matrix">
+<p>Özellikle çok sayıda entity ile çalışırken matrix diyagramı, hiçbir ilişkiyi atlamadığından emin olmanın iyi bir yoludur.</p>
+<p>Örnekte bir seyahat acentesi, müşterilerinin gezdiği ülkeleri ve gördüğü önemli yerleri (landmark) kaydediyor:</p>
+${figure(`<div class="table-wrap"><table class="matrix">
   <thead><tr><th></th><th>TRAVELER</th><th>COUNTRY</th><th>LANDMARK</th></tr></thead>
   <tbody>
     <tr><td>TRAVELER</td><td class="diag"></td><td>visit</td><td>have seen</td></tr>
-    <tr><td>COUNTRY</td><td>visited by</td><td class="diag"></td><td>the location of</td></tr>
+    <tr><td>COUNTRY</td><td style="color:var(--red);font-weight:800">visited by</td><td class="diag"></td><td>the location of</td></tr>
     <tr><td>LANDMARK</td><td>seen by</td><td>located in</td><td class="diag"></td></tr>
   </tbody>
-</table></div>
-${mix('Hep tek yönde oku', `Satır, sonra hücre, sonra sütun: “COUNTRY visited by TRAVELER” doğru. “TRAVELER visited by COUNTRY” yanlış.`)}
-${note(`Matrix diyagramı optionality ve cardinality göstermez. Önce ilişkileri ERDish ile yaz, sonra ERD’yi çiz. Bir entity kendisiyle ilişkiliyse köşegendeki hücre de dolar.`)}
-${say(`Each LANDMARK <b>must</b> be located in <b>one and only one</b> COUNTRY.`, `Her yer tek bir ülkededir.`)}
-${say(`Each COUNTRY <b>may</b> be the location of <b>one or more</b> LANDMARKs.`, `Bir ülkede birden çok yer olabilir.`)}
-${say(`Each TRAVELER <b>may</b> visit <b>one or more</b> COUNTRIES.`, `TRAVELER ile diğer iki entity arasındaki ilişkilerin hepsi “may … one or more”.`)}
-${erd('travel', 'Matristen çıkan ERD. TRAVELER ile diğer ikisi arasında many-to-many ilişki var; bunun çözümü 5-3’te.')}
+</table></div>`, '', `Kırmızı hücreyi okumak için önce satırın başındaki entity’yi, sonra hücredeki adı, en son sütunun başındaki entity’yi söyle: “COUNTRY visited by TRAVELER”. Köşegendeki taralı hücreler boş, çünkü bu örnekte hiçbir entity kendisiyle ilişkili değil.`)}
+${mix('Hep tek yönde oku', `Matrisi her zaman aynı sırayla okursun: önce satırdaki entity, sonra hücredeki ilişki adı, en son sütundaki entity. Yani “COUNTRY visited by TRAVELER” doğru, “TRAVELER visited by COUNTRY” yanlış. Aynı şekilde “LANDMARK seen by TRAVELER” doğru, “TRAVELER seen by LANDMARK” yanlış.`)}
+${note(`Matrix diyagramı optionality ve cardinality göstermez; sadece hangi entity’ler arasında ilişki olduğunu ve ilişkinin adını gösterir. Bu yüzden önce ilişkileri ERDish ile yazarsın, sonra ERD’yi çizersin. Bir entity kendisiyle ilişkiliyse köşegendeki hücre de dolar.`)}
+${say(`Each LANDMARK <b>must</b> be located in <b>one and only one</b> COUNTRY.`, `Her landmark tek bir ülkede bulunur.`)}
+${say(`Each COUNTRY <b>may</b> be the location of <b>one or more</b> LANDMARKs.`, `Bir ülkede birden çok landmark olabilir, ama hiç olmayabilir de.`)}
+${say(`Each TRAVELER <b>may</b> visit <b>one or more</b> COUNTRIES.`, `Bir yolcu bir ya da daha çok ülke gezebilir, ama hiç gezmemiş de olabilir.`)}
+${say(`Each COUNTRY <b>may</b> be visited by <b>one or more</b> TRAVELERs.`, `Bir ülkeyi bir ya da daha çok yolcu gezmiş olabilir, ama hiç kimse gezmemiş de olabilir.`)}
+<p>TRAVELER ile LANDMARK arasındaki ilişki de iki yönde aynı kalıptadır: “Each TRAVELER may have seen one or more LANDMARKs” ve “Each LANDMARK may be seen by one or more TRAVELERs”.</p>
+${erd('travel', 'Matristen çıkan ERD. TRAVELER ile diğer iki entity arasında many-to-many ilişki var; bunun nasıl çözüldüğünü 5-3’te göreceksin.', `Matristeki her ilişki burada bir çizgi oldu. TRAVELER’dan çıkan iki çizginin iki yarısı da kesikli ve iki ucunda da crow’s foot var, yani iki yönde de “may … one or more”. LANDMARK ile COUNTRY arasındaki çizgi ise LANDMARK tarafında düz (must), COUNTRY ucunda da çatalsız (one and only one).`)}
 `,
     },
   ],

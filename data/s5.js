@@ -30,6 +30,19 @@ ERDS.roles = {
     { a: { e: 'p', side: 'r', off: 40, must: false, label: 'acting as' }, b: { e: 's', side: 'l', must: true, label: 'role of', ly: 136 } },
   ],
 };
+ERDS.process = {
+  w: 490, h: 160, label: 'One-to-one: süreç aşamaları',
+  ents: [
+    { id: 'ex', name: 'EXAM', x: 20, y: 20, w: 140, minH: 46 },
+    { id: 'ak', name: 'ANSWER KEY', x: 330, y: 20, w: 140, minH: 46 },
+    { id: 'rc', name: 'RECIPE', x: 20, y: 100, w: 140, minH: 46 },
+    { id: 'di', name: 'DISH', x: 330, y: 100, w: 140, minH: 46 },
+  ],
+  rels: [
+    { a: { e: 'ex', side: 'r', must: true, label: 'evaluated with' }, b: { e: 'ak', side: 'l', must: true, label: 'for', ly: 60 } },
+    { a: { e: 'rc', side: 'r', must: false, label: 'the basis for' }, b: { e: 'di', side: 'l', must: false, label: 'the result', ly: 140 } },
+  ],
+};
 const towns = (hlA, hlB) => ({
   w: 330, h: 300,
   ents: [
@@ -63,6 +76,7 @@ ERDS.enroll = {
     { id: 'st', name: 'STUDENT', x: 20, y: 140, w: 130, attrs: ['# ID', '* First name', '* Last name'] },
     { id: 'su', name: 'SUBJECT', x: 340, y: 140, w: 130, attrs: ['# ID', '* Name'] },
   ],
+  notes: [{ x: 250, y: 91, text: '← bar →', cls: 'hl', anchor: 'middle' }],
   rels: [
     { a: { e: 'en', side: 'b', off: -35, must: true, many: true, bar: true, label: 'for', ly: 112 }, b: { e: 'st', side: 'r', must: false, label: 'enrols for', ly: 197 }, via: [[215, 177.5]] },
     { a: { e: 'en', side: 'b', off: 35, must: true, many: true, bar: true, label: 'for', lx: 293, ly: 112, anchor: 'start' }, b: { e: 'su', side: 'l', must: false, label: 'subject of', lx: 334, ly: 190 }, via: [[285, 170]] },
@@ -73,7 +87,7 @@ SECTIONS.push({
   no: 5,
   title: 'İlişkileri iyileştirmek',
   en: 'Refining Relationships',
-  desc: 'Transferability, 1:1 / 1:M / M:M ilişki türleri, gereksiz ilişkiler ve M:M ilişkinin çözümü.',
+  desc: 'Transferability’yi, 1:1, 1:M ve M:M ilişki türlerini, gereksiz ilişkileri ve M:M ilişkinin nasıl çözüldüğünü öğreniyorsun.',
   lessons: [
     // ------------------------------------------------------------------ 5-1
     {
@@ -81,17 +95,19 @@ SECTIONS.push({
       title: 'İlişkinin aktarılabilirliği',
       en: 'Relationship Transferability',
       html: `
-<p class="lead">Optionality ve cardinality’den (3-1) sonra bir ilişkiye sorulan üçüncü soru şu: bu ilişki bir instance’tan başka bir instance’a taşınabilir mi?</p>
-${term(`Transferable`, `Aktarılabilir`, `<p>İlişki başka bir instance’a taşınabilir. Öğrenci bir çalışma grubundan (STUDY GROUP) başka bir gruba geçebilir, çalışan başka departmana tayin olabilir.</p>`, {
+<p class="lead">Optionality ve cardinality’den (3-1) sonra bir ilişkiye sorduğumuz üçüncü soru şu: Bu ilişki bir instance’tan başka bir instance’a taşınabilir mi?</p>
+${term(`Transferable`, `Aktarılabilir`, `<p>Transferable, ilişkinin başka bir instance’a taşınabildiği anlamına gelir.</p>`, {
   star: true,
   exam: `A STUDENT being allowed to move from one STUDY GROUP to another`,
+  more: `<p>Mesela bir öğrenci bir çalışma grubundan (STUDY GROUP) başka bir gruba geçebilir, bir çalışan da başka bir departmana tayin olabilir. Bir öğretmene verilmiş bir sınıf (CLASS) da dönem ortasında başka bir öğretmene aktarılabilir; öyle olmasaydı, öğretmen hastalandığında sınıfı kimseye veremezdin.</p>`,
 })}
-${term(`Nontransferable`, `Aktarılamaz`, `<p>İlişki bir kez kurulunca değiştirilemez. Öğrenciye kesilen makbuz (RECEIPT) başka öğrenciye devredilemez; yanlış kesildiyse iptal edilir, yenisi yazılır. Bir şiirin yazarı da değişmez. ERD’de çizginin üstüne <b>elmas</b> (diamond) konur.</p>`, {
+${term(`Nontransferable`, `Aktarılamaz`, `<p>Nontransferable bir ilişki bir kez kurulduktan sonra değiştirilemez ve ERD’de çizgisinin üstüne bir <b>elmas</b> (diamond) konur.</p>`, {
   star: true,
   exam: `A nontransferable relationship is represented with the diamond on the relationship`,
+  more: `<p>Mesela öğrenciye kesilen makbuz (RECEIPT) başka bir öğrenciye devredilemez; yanlış kesildiyse iptal edilir ve yenisi yazılır. Bir şiirin (POEM) yazarı (AUTHOR) da sonradan değişmez. Nontransferable ilişkiler genellikle bir iş kuralını yansıttığı için önemlidir; ERD veritabanına dönüştürülürken de bunun sonuçları olur.</p>`,
 })}
-${erd('receipt', 'Elmas genellikle crow’s foot tarafına çizilir.')}
-${note(`Aktarılıp aktarılamayacağına işletme karar verir. Bazı spor salonları üyeliğin başkasına devrine izin verir, bazıları vermez.`)}
+${erd('receipt', '','Çizginin üstündeki kırmızı elmas, ilişkinin nontransferable olduğunu gösterir: bir makbuz bir öğrenciye kesildikten sonra başka bir öğrenciye geçemez. Elmasın, crow’s foot olan RECEIPT tarafında durduğuna dikkat et; elmas genellikle oraya çizilir.')}
+${note(`Bir ilişkinin aktarılıp aktarılamayacağına işletme karar verir. Mesela bazı spor salonları üyeliğin başkasına devredilmesine izin verir, bazıları vermez.`)}
 `,
     },
 
@@ -101,30 +117,34 @@ ${note(`Aktarılıp aktarılamayacağına işletme karar verir. Bazı spor salon
       title: 'İlişki türleri',
       en: 'Relationship Types',
       html: `
-${term(`One-to-many (1:M)`, `Bire çok`, `<p>Bir uçta single toe, öbür uçta crow’s foot. En sık görülen türdür. Many tarafı may ise “sıfır veya daha çok”, must ise “bir veya daha çok” demektir.</p>`, {
+${term(`One-to-many (1:M)`, `Bire çok`, `<p>One-to-many ilişkide çizginin bir ucunda single toe, öbür ucunda crow’s foot vardır ve ER modelde en sık gördüğün tür budur.</p>`, {
   star: true,
   exam: `The various types of 1:M relationships are most common in an ER Model`,
 })}
-${erd('oneMany')}
-${term(`Many-to-many (M:M)`, `Çoka çok`, `<p>İki uçta da crow’s foot. İlk taslaklarda sık görülür, ama modelleme ilerledikçe hepsi çözülür ve kaybolur. Çoğu zaman modelde bir entity’nin eksik olduğunu gösterir. Nasıl çözüldüğü 5-3’te.</p>`, {
+${erd('oneMany', '', 'Çizginin EMPLOYEE ucunda crow’s foot, DEPARTMENT ucunda single toe var: bir departmanda birçok çalışan olabilir, ama her çalışan tek bir departmana bağlıdır. EMPLOYEE tarafı düz (must), DEPARTMENT tarafı kesikli (may) çizildiği için her çalışanın bir departmanı olmak zorunda, ama boş bir departman da olabilir. “Many” kelimesi optionality’ye göre değişir: çizgi crow’s foot tarafında düzse “bir veya daha çok”, kesikliyse “sıfır veya daha çok” demektir.')}
+${term(`Many-to-many (M:M)`, `Çoka çok`, `<p>Many-to-many ilişkide çizginin iki ucunda da crow’s foot vardır ve modelleme ilerledikçe bu ilişkilerin hepsi çözülüp ortadan kalkar.</p>`, {
   star: true,
   exam: `In later stages of the modeling process, all M:M relationships will be resolved, and disappear`,
+  more: `<p>M:M ilişkiler özellikle ER modelin ilk versiyonunda sık karşına çıkar.</p>`,
 })}
-${erd('manyMany')}
-${term(`One-to-one (1:1)`, `Bire bir`, `<p>İki uçta da single toe. Az görülür; genelde rolleri (PERSON → TEACHER) ya da bir sürecin aşamalarını (RECIPE → DISH) modellerken çıkar.</p>`, {
+${erd('manyMany', '', 'İki uçta da crow’s foot var: bir öğrenci birçok öğretmenden ders alır, bir öğretmen de birçok öğrenciye ders verir. Böyle bir ilişki çoğu zaman modelde bir entity’nin eksik olduğunu gösterir; 5-3’te bu eksik entity’yi ekleyip çizgiyi nasıl ortadan kaldırdığımızı göreceksin.')}
+${term(`One-to-one (1:1)`, `Bire bir`, `<p>One-to-one ilişkide çizginin iki ucunda da single toe vardır; az görülür ve genelde rolleri (PERSON → TEACHER) ya da bir sürecin aşamalarını (RECIPE → DISH, EXAM → ANSWER KEY) modellerken karşına çıkar.</p>`, {
   exam: `Mandatory at one end of the 1:1 relationship commonly occurs when roles are modeled`,
 })}
-${erd('roles')}
-${note(`İki uç da zorunlu 1:M ilişkide entity’ler birbiri olmadan var olamaz (ORDER ve ORDER ITEM). “Bir” tarafı zorunlu, “çok” tarafı isteğe bağlı olan 1:M nadirdir (BAND ve MUSICIAN). İki ucu da zorunlu 1:1 varsa iki ayrı entity tutmak için bir iş gereği olmalı. Bir PERSON aynı anda hem TEACHER hem STUDENT olamıyorsa bunlar PERSON’ın subtype’ları (4-1) olarak da çizilebilirdi.`, 'Slayt notlarından')}
+${erd('roles', '', 'İki çizginin de iki ucunda single toe var, yani bir PERSON en fazla bir TEACHER ve en fazla bir STUDENT rolüne sahip olur. Çizgi PERSON tarafında kesikli (may), rol tarafında düz (must): her kişi öğretmen olmak zorunda değil, ama her TEACHER mutlaka bir kişidir. “Mandatory at one end” budur.')}
+${erd('process', '', 'Bunlar süreç aşamalarını gösteren iki 1:1 ilişki. EXAM ile ANSWER KEY arasındaki çizgi iki uçta da düz, yani iki taraf da zorunlu. RECIPE ile DISH arasındaki çizgi ise iki uçta da kesikli, yani iki taraf da isteğe bağlı. Rollerdeki gibi bir ucu zorunlu olanı da sayarsan, 1:1 ilişkinin üç çeşidini de görmüş olursun.')}
+${note(`İki ucu da zorunlu olan bir 1:M ilişkide entity’ler birbiri olmadan var olamaz; ORDER ve ORDER ITEM gibi. “Bir” tarafı zorunlu, “çok” tarafı isteğe bağlı olan 1:M ise nadirdir; BAND ve MUSICIAN buna örnektir. İki ucu da zorunlu bir 1:1 ilişki (EXAM ve ANSWER KEY gibi) iki entity’yi sıkıca bağlar; bu durumda iki ayrı entity tutmak için bir iş gereği olmalıdır.`)}
+${more(`<p>Bir PERSON aynı anda hem TEACHER hem STUDENT olamıyorsa, bunlar PERSON’ın subtype’ları (4-1) olarak da çizilebilirdi.</p>`)}
 
 ${h2('Gereksiz ilişki')}
-${term(`Redundant`, `Gereksiz, fazlalık`, `<p>Başka ilişkilerden çıkarılabilen ilişki; silinir. Kişi bir TOWN’da yaşıyor, TOWN da bir COUNTRY’de bulunuyorsa kişinin ülkesi zaten bilinir. Kırmızı çizgi gereksizdir.</p>`, {
+${term(`Redundant`, `Gereksiz, fazlalık`, `<p>Redundant ilişki, modeldeki başka ilişkilerden zaten çıkarılabilen ilişkidir; bu yüzden silinir.</p>`, {
   star: true,
   exam: `A redundant relationship can be derived from another relationship in the model <i>(derive = türetmek)</i>`,
+  more: `<p>Mesela bir kişi bir TOWN’da yaşıyor, o TOWN da bir COUNTRY’de bulunuyorsa kişinin hangi ülkede yaşadığı zaten bellidir. Aşağıdaki diyagramda kırmızı çizgi bu yüzden gereksizdir.</p>`,
 })}
-${erd('redundant')}
-${mix('Önce ilişkiyi oku', `Sadece çizime bakıp karar verme. Kırmızı çizgi <b>born in</b> (doğduğu ülke) ise gereksiz değildir, çünkü insan doğduğu ülkeden başka bir yerde yaşayabilir.`)}
-${erd('notRedundant')}
+${erd('redundant', '', 'Siyah çizgileri takip et: PERSON → TOWN → COUNTRY. Kişinin yaşadığı ülke bu yoldan zaten bulunuyor. Bu yüzden kırmızı, doğrudan PERSON → COUNTRY çizgisi (living in) aynı bilgiyi tekrarlıyor ve silinmeli.')}
+${mix('Önce ilişkiyi oku', `Sadece çizime bakıp karar verme, önce ilişkinin ne dediğini oku. Kırmızı çizgi <b>born in</b> (doğduğu ülke) anlamına geliyorsa gereksiz değildir, çünkü insan doğduğu ülkeden başka bir yerde yaşayabilir.`)}
+${erd('notRedundant', '', 'Şekil yukarıdakiyle aynı, değişen tek şey kırmızı çizginin adı: born in. Siyah yol kişinin şu an yaşadığı ülkeyi, kırmızı çizgi ise doğduğu ülkeyi verir; bu yüzden kırmızı çizgi kalır.')}
 `,
     },
 
@@ -134,18 +154,21 @@ ${erd('notRedundant')}
       title: 'Many-to-many ilişkiyi çözmek',
       en: 'Resolving Many-to-Many Relationships',
       html: `
-<p class="lead">Bir öğrenci birçok derse (SUBJECT) girer, bir derse de birçok öğrenci girer: M:M. Peki notu (Grade) nereye yazacağız? STUDENT’a yazarsan hangi derse ait olduğu, SUBJECT’e yazarsan kimin notu olduğu bilinmez. Not ikisinden birine değil, aradaki ilişkiye aittir.</p>
-${erd('mmSubject')}
-${term(`Intersection entity`, `Kesişim entity’si`, `<p>M:M ilişkiyi çözmek için araya eklenen üçüncü entity. İlişkinin attribute’unu (Grade) o taşır. Sonunda bir M:M ilişki, iki tane 1:M ilişkiye dönüşür ve iki crow’s foot da yeni entity’nin tarafında olur.</p>`, {
+<p class="lead">STUDENT ile SUBJECT (ders) arasında M:M bir ilişki var ve notu (Grade) ikisinden birine yazamazsın, çünkü not aradaki ilişkiye aittir.</p>
+${more(`<p>Bir öğrenci birçok derse girer, bir derse de birçok öğrenci girer; ilişkinin M:M olması bundandır. Notu STUDENT’a yazarsan notun hangi derse ait olduğu, SUBJECT’e yazarsan kimin notu olduğu belli olmaz.</p>`)}
+${erd('mmSubject', '', '<b>Önce:</b> STUDENT ile SUBJECT, iki ucunda da crow’s foot olan tek bir M:M çizgiyle bağlı. Grade’i koyacak yer yok, çünkü iki kutuda da sadece o entity’nin kendi bilgileri duruyor. Her attribute bir entity’ye ait olmak zorunda olduğu için araya üçüncü bir entity gerekir.')}
+${term(`Intersection entity`, `Kesişim entity’si`, `<p>Intersection entity, M:M bir ilişkiyi çözmek için iki entity’nin arasına eklenen üçüncü entity’dir ve böylece o M:M ilişki iki tane 1:M ilişkiye dönüşür.</p>`, {
   star: true,
   exam: `The product of the resolution of a many to many relationship <i>(resolution = çözüm)</i>`,
+  more: `<p>İlişkiye ait attribute’u (burada Grade) o taşır. İki crow’s foot da yeni entity’nin tarafında olur.</p>`,
 })}
-${erd('enroll', 'ENROLLMENT tarafı düz çizgidir: bir kayıt, öğrencisi ve dersi olmadan var olamaz.')}
-${term(`Barred relationship`, `Çubuklu ilişki`, `<p>Bir entity’nin UID’sine katılan ilişki. Çizginin üstünde küçük dik bir çubukla gösterilir. ENROLLMENT’ın UID’si STUDENT ID ile SUBJECT ID’nin birleşimidir. Bu ID’ler kutuya ayrıca yazılmaz, çubuklar bunu zaten söyler.</p>`, {
+${erd('enroll', 'ENROLLMENT tarafında çizgiler düzdür, çünkü bir kayıt öğrencisi ve dersi olmadan var olamaz.', '<b>Sonra:</b> Aradaki M:M çizgi kalktı, yerine ENROLLMENT geldi; artık iki tane 1:M ilişki var, iki crow’s foot da ENROLLMENT tarafında ve Grade ENROLLMENT’ın içinde. Kırmızı “bar” yazısının iki yanındaki küçük yatay çizgiler bar’lardır; ne anlama geldikleri hemen aşağıda.')}
+${term(`Barred relationship`, `Çubuklu ilişki`, `<p>Barred relationship, bir entity’nin UID’sine katılan ilişkidir ve çizginin üstüne konan küçük dik bir çubukla (bar) gösterilir.</p>`, {
   star: true,
+  ex: `ENROLLMENT’ın UID’si STUDENT ID ile SUBJECT ID’nin birleşimidir; çubuklar bunu zaten gösterdiği için bu ID’ler kutunun içine ayrıca yazılmaz.`,
   exam: `A relationship that participates in an entity's unique identifier <i>(participate = katılmak)</i>`,
 })}
-<p>Slayttaki diğer örnekler de aynı yolla çözülür: TV SHOW ile PERSON arasına <b>VIEWING RECORD</b>, COMPANY ile CLEANING SERVICE arasına <b>CLEANING SCHEDULE</b> eklenir.</p>
+<p>Diğer örnekler de aynı yolla çözülür: TV SHOW ile PERSON arasına <b>VIEWING RECORD</b>, COMPANY ile CLEANING SERVICE arasına da <b>CLEANING SCHEDULE</b> eklenir.</p>
 `,
     },
   ],

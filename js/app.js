@@ -8,8 +8,45 @@
     get(k, d) { try { const v = localStorage.getItem('dbguide-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('dbguide-' + k, JSON.stringify(v)); } catch (e) {} },
   };
+  // ---------- bölüm (department) seçimi ----------
+  const dept = store.get('dept', null);
+  const COURSE = window.COURSES[dept];
+  if (!COURSE) return chooseDept();
+  // her bölümün ilerlemesi ayrı saklanır (İngilizce bölüm eski anahtarları kullanır)
+  const K = k => COURSE.keyPrefix + k;
+  const SECTIONS = COURSE.sections, QUIZZES = COURSE.quizzes, U = COURSE.unit;
+  document.documentElement.lang = 'tr';
+  $$('.brand-text, .mobilebar-title').forEach(el => { el.textContent = COURSE.name; });
+  $('#search').placeholder = COURSE.searchHint;
+
+  function chooseDept() {
+    document.body.classList.add('choosing');
+    const info = c => {
+      const secs = c.sections, n = secs.reduce((a, s) => a + s.lessons.length, 0);
+      const tests = secs.filter(s => (c.quizzes[s.no] || []).length).length;
+      return `${secs.length} ${c.unit.toLocaleLowerCase('tr')}, ${n} ders, ${tests} test`;
+    };
+    view.innerHTML = `
+    <div class="page chooser">
+      <h1>Hangi bölümdesin?</h1>
+      <p class="home-lead">Bölümüne göre kendi dersinin notlarını ve testlerini göreceksin. Seçimini bu tarayıcı hatırlar; istersen sonra menünün altından değiştirebilirsin.</p>
+      <div class="choices">
+        ${['en', 'tr'].map(k => { const c = window.COURSES[k]; return `
+        <button class="sbox choice" type="button" data-dept="${k}">
+          <span class="choice-name">${c.dept}</span>
+          <span class="choice-course">${c.source}</span>
+          <span class="choice-desc">${k === 'en' ? 'Türkçe anlatım, sınav için İngilizce terimler ve İngilizce testler.' : 'Türkçe anlatım ve Türkçe testler. Terimlerin İngilizcesi de yanında.'}</span>
+          <span class="choice-meta">${info(c)}</span>
+        </button>`; }).join('')}
+      </div>
+    </div>`;
+    $$('.choice', view).forEach(b => {
+      b.onclick = () => { store.set('dept', b.dataset.dept); location.reload(); };
+    });
+  }
+
   // bozuk ya da elle değiştirilmiş kayıtlar siteyi çökertmesin
-  const storedDone = store.get('done', []);
+  const storedDone = store.get(K('done'), []);
   let done = new Set(Array.isArray(storedDone) ? storedDone : []);
   let quick = store.get('quick', false) === true;
   const smooth = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
@@ -20,6 +57,9 @@
   const lessons = [];
   SECTIONS.sort((a, b) => a.no - b.no).forEach(s => s.lessons.forEach(l => { l.section = s; lessons.push(l); }));
   const byId = Object.fromEntries(lessons.map(l => [l.id, l]));
+  // ekranda görünen ders numarası: aynı numaralı iki ders olabilir (Türkçe bölümde iki tane H4), adresleri farklıdır
+  lessons.forEach(l => { l.no = l.label || l.id; });
+  const lno = id => (byId[id] ? byId[id].no : id);
 
   const slug = s => s.toLocaleLowerCase('tr')
     .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c')
@@ -44,16 +84,16 @@
       return item;
     });
   });
-  terms.sort((a, b) => a.en.localeCompare(b.en, 'en'));
+  terms.sort((a, b) => a.en.localeCompare(b.en, COURSE.locale));
 
   // Testler: her bölümün sonunda bir test sayfası
-  const storedScores = store.get('quiz', {});
+  const storedScores = store.get(K('quiz'), {});
   let scores = storedScores && typeof storedScores === 'object' && !Array.isArray(storedScores) ? storedScores : {};
   const pages = [];
   SECTIONS.forEach(s => {
     s.quiz = QUIZZES[s.no] || [];
-    s.lessons.forEach(l => pages.push({ href: '#/ders/' + l.id, label: l.id + ' ' + l.title, kind: 'ders' }));
-    if (s.quiz.length) pages.push({ href: '#/test/' + s.no, label: 'Bölüm ' + s.no + ' testi', kind: 'test' });
+    s.lessons.forEach(l => pages.push({ href: '#/ders/' + l.id, label: l.no + ' ' + l.title, kind: 'ders' }));
+    if (s.quiz.length) pages.push({ href: '#/test/' + s.no, label: U + ' ' + s.no + ' testi', kind: 'test' });
   });
   const pageIndex = path => pages.findIndex(p => p.href === '#' + path);
   const scoreText = s => scores[s.no] ? `${scores[s.no].best} / ${s.quiz.length}` : `${s.quiz.length} soru`;
@@ -66,16 +106,16 @@
       <li><a href="#/sozluk"${route.startsWith('#/sozluk') ? ' aria-current="page"' : ''}>Terim sözlüğü</a></li>
     </ul>`;
     SECTIONS.forEach(s => {
-      html += `<p class="nav-section">Bölüm ${s.no}: ${s.title}</p><ol class="rail">`;
+      html += `<p class="nav-section">${U} ${s.no}: ${s.title}</p><ol class="rail">`;
       s.lessons.forEach(l => {
         const cur = route.startsWith('#/ders/' + l.id);
         html += `<li class="${done.has(l.id) ? 'done' : ''}"><a href="#/ders/${l.id}"${cur ? ' aria-current="page"' : ''}>
-          <span class="rail-id">${l.id}</span><span>${l.title}</span>${done.has(l.id) ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`;
+          <span class="rail-id">${l.no}</span><span>${l.title}</span>${done.has(l.id) ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`;
       });
       if (s.quiz.length) {
         const cur = route.startsWith('#/test/' + s.no);
         html += `<li class="test${scores[s.no] ? ' done' : ''}"><a href="#/test/${s.no}"${cur ? ' aria-current="page"' : ''}>
-          <span class="rail-id"></span><span>Bölüm testi</span><span class="rail-score">${scoreText(s)}</span></a></li>`;
+          <span class="rail-id"></span><span>${U} testi</span><span class="rail-score">${scoreText(s)}</span></a></li>`;
       }
       html += `</ol>`;
     });
@@ -93,16 +133,16 @@
 
   // ---------- ana sayfa ----------
   function home() {
-    const last = byId[store.get('last', '')];
+    const last = byId[store.get(K('last'), '')];
     const firstOpen = lessons.find(l => !done.has(l.id)) || lessons[0];
     const go = last && !done.has(last.id) ? last : firstOpen;
-    const cta = done.size || last ? `Kaldığın yerden devam et: ${go.id} ${go.title}` : `Başla: ${go.id} ${go.title}`;
+    const cta = done.size || last ? `Kaldığın yerden devam et: ${go.no} ${go.title}` : `Başla: ${go.no} ${go.title}`;
 
     view.innerHTML = `
     <div class="page home">
       <header class="home-head">
-        <h1>Veritabanı Tasarımı vize notları</h1>
-        <p class="home-lead">Oracle Academy “Database Design” slaytlarının Türkçe özeti. Her İngilizce terimin ne demek olduğunu sade bir dille anlatıyor, sınavda karşına çıkacak İngilizce ifadeyi de yanına yazıyor. Her bölümün sonunda, sınavdaki gibi İngilizce bir test var.</p>
+        <h1>${COURSE.title}</h1>
+        <p class="home-lead">${COURSE.lead}</p>
         <a class="btn" href="#/ders/${go.id}">${cta}</a>
       </header>
 
@@ -110,18 +150,18 @@
         ${SECTIONS.map((s, i) => `
           ${i ? '<div class="course-link" aria-hidden="true"></div>' : ''}
           <section class="sbox">
-            <h2 class="sbox-name">Bölüm ${s.no}: ${s.title}</h2>
+            <h2 class="sbox-name">${U} ${s.no}: ${s.title}</h2>
             <p class="sbox-desc">${s.desc}</p>
             <ul class="sbox-attrs">
               ${s.lessons.map(l => `<li class="${done.has(l.id) ? 'done' : ''}"><a href="#/ders/${l.id}">
                 <span class="attr-mark" aria-hidden="true">${done.has(l.id) ? '✓' : ''}</span>
-                <span class="attr-id">${l.id}</span>
+                <span class="attr-id">${l.no}</span>
                 <span class="attr-name">${l.title}</span>
                 <span class="attr-min">${l.minutes} dk</span>${done.has(l.id) ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`).join('')}
               ${s.quiz.length ? `<li class="test-row"><a href="#/test/${s.no}">
                 <span class="attr-mark" aria-hidden="true">${scores[s.no] ? '✓' : ''}</span>
                 <span class="attr-id"></span>
-                <span class="attr-name">Bölüm testi</span>
+                <span class="attr-name">${U} testi</span>
                 <span class="attr-min">${scoreText(s)}</span></a></li>` : ''}
             </ul>
           </section>`).join('')}
@@ -132,11 +172,11 @@
         <dl>
           <div><dt><span class="term-mark">#</span></dt><dd><b>Anahtar terim.</b> Sınavda en sık sorulanlar. ERD’de de <code>#</code> “anahtar” (unique identifier) demektir.</dd></div>
           <div><dt><span class="term-mark plain">*</span></dt><dd><b>Bilmen gereken terim;</b> bunları da atlama. (ERD’de <code>*</code> “zorunlu” demektir.)</dd></div>
-          <div><dt><span class="exam-tag">Sınavda</span></dt><dd>Slayttaki İngilizce ifade. Sınav İngilizce olduğu için bunu tanıman lazım; zor kelimelerin Türkçesi parantez içinde.</dd></div>
+          ${COURSE.examTag ? `<div><dt><span class="exam-tag">${COURSE.examTag}</span></dt><dd>${COURSE.examLegend}</dd></div>` : ''}
           <div><dt><span class="legend-swatch mix"></span></dt><dd><b>Karıştırma:</b> birbirine çok benzeyen, sık karıştırılan kavramlar.</dd></div>
-          <div><dt><span class="legend-swatch info"></span></dt><dd><b>Not:</b> slaytta olmayan ama anlamana yardım eden açıklama ya da slayttaki bir hatanın düzeltmesi.</dd></div>
+          <div><dt><span class="legend-swatch info"></span></dt><dd><b>Not:</b> konuyu anlamana yardım eden kısa bir açıklama.</dd></div>
         </dl>
-        <p class="scope">1-1 (Oracle Academy tanıtımı, maaşlar, sertifikalar) veritabanı konusu içermediği için alınmadı. 7. bölüm, slaytları gelince eklenecek.</p>
+        <p class="scope">${COURSE.scope}</p>
       </section>
     </div>`;
   }
@@ -145,14 +185,14 @@
   function lessonPage(id, focus) {
     const l = byId[id];
     if (!l) return home();
-    store.set('last', id);
+    store.set(K('last'), id);
     const isDone = done.has(id);
 
     view.innerHTML = `
     <article class="page lesson">
-      <p class="crumbs"><a href="#/">Ana sayfa</a> / Bölüm ${l.section.no}: ${l.section.title}</p>
+      <p class="crumbs"><a href="#/">Ana sayfa</a> / ${U} ${l.section.no}: ${l.section.title}</p>
       <header class="sbox lesson-box">
-        <h1><span class="lesson-id">${l.id}</span>${l.title}</h1>
+        <h1><span class="lesson-id">${l.no}</span>${l.title}</h1>
         <p class="lesson-en" lang="en">${l.en}</p>
         <ul class="sbox-attrs term-index" aria-label="Bu dersteki terimler">
           ${l.terms.map(t => `<li><a href="#/ders/${id}?t=${t.id}"><span class="attr-mark" aria-hidden="true">${t.key ? '#' : '*'}</span><span class="attr-name" lang="en">${t.en}</span><span class="attr-tr">${t.tr}</span></a></li>`).join('')}
@@ -180,10 +220,11 @@
     };
     renderERDs(view);
     linkRefs($('.content', view), id);
+    revealChanges(view);
 
     $('#doneBtn').onclick = () => {
       done.has(id) ? done.delete(id) : done.add(id);
-      store.set('done', [...done]);
+      store.set(K('done'), [...done]);
       buildNav();
       lessonPage(id);
       $('.done-row').scrollIntoView({ block: 'center' });
@@ -235,6 +276,14 @@
     });
   }
 
+  // Dar ekranda tablo sığmazsa, eklenen ya da silinen sütun görünsün diye tabloyu o sütuna kaydırır
+  function revealChanges(root) {
+    requestAnimationFrame(() => $$('.dbt-change .dbt-scroll', root).forEach(s => {
+      const th = $('th.col-add, th.col-drop', s);
+      if (th && s.scrollWidth > s.clientWidth) s.scrollLeft = th.offsetLeft + th.offsetWidth - s.clientWidth;
+    }));
+  }
+
   function pager(path) {
     const i = pageIndex(path), prev = pages[i - 1], next = pages[i + 1];
     const link = (p, cls, word) => p
@@ -260,7 +309,7 @@
     if (!s || !s.quiz.length) return home();
     const all = s.quiz.map((q, i) => ({
       i, l: q.l, q: q.q, why: q.why, erd: q.erd,
-      opts: q.tf ? ['True', 'False'] : q.o,
+      opts: q.tf ? COURSE.tf : q.o,
       correct: q.tf ? [q.a ? 0 : 1] : [].concat(q.a),
       multi: Array.isArray(q.a), tf: !!q.tf,
     }));
@@ -272,23 +321,23 @@
 
     view.innerHTML = `
     <article class="page test">
-      <p class="crumbs"><a href="#/">Ana sayfa</a> / Bölüm ${s.no}: ${s.title}</p>
+      <p class="crumbs"><a href="#/">Ana sayfa</a> / ${U} ${s.no}: ${s.title}</p>
       <header class="sbox lesson-box">
-        <h1><span class="lesson-id">Bölüm ${s.no}</span>Bölüm testi</h1>
-        <p class="lesson-en" lang="en">Section ${s.no} quiz</p>
+        <h1><span class="lesson-id">${U} ${s.no}</span>${U} testi</h1>
+        <p class="lesson-en">${COURSE.quizSub(s.no)}</p>
         <ul class="sbox-attrs term-index" aria-label="Testin kapsadığı dersler">
-          ${s.lessons.map(l => `<li><a href="#/ders/${l.id}"><span class="attr-mark" aria-hidden="true">*</span><span class="attr-name">${l.id} ${l.title}</span></a></li>`).join('')}
+          ${s.lessons.map(l => `<li><a href="#/ders/${l.id}"><span class="attr-mark" aria-hidden="true">*</span><span class="attr-name">${l.no} ${l.title}</span></a></li>`).join('')}
         </ul>
       </header>
       <div class="lesson-meta test-meta">
-        <p>${only ? `Sadece yanlış yaptığın ${n} soru.` : `${n} soru, sorular İngilizce.`} Bir şık seçince cevap hemen kontrol edilir ve altında Türkçe açıklaması çıkar. Birden çok cevaplı sorularda şıkları seçip “Cevabı kontrol et”e bas.</p>
+        <p>${only ? `Sadece yanlış yaptığın ${n} soru.` : `${n} soru, sorular ${COURSE.quizLang}.`} Bir şık seçince cevap hemen kontrol edilir ve altında Türkçe açıklaması çıkar. Birden çok cevaplı sorularda şıkları seçip “Cevabı kontrol et”e bas.</p>
         ${best ? `<p>En iyi sonucun: <b>${best.best} / ${s.quiz.length}</b></p>` : ''}
       </div>
       <ol class="quiz">
         ${list.map((q, k) => {
           const order = q.tf ? [0, 1] : shuffle(q.opts.map((_, j) => j));
           return `<li class="qz" data-q="${q.i}">
-            <p class="qz-head"><span>Soru ${k + 1} / ${n}</span><a href="#/ders/${q.l}" target="_blank" rel="noopener" title="Ders yeni sekmede açılır, testin kaybolmaz">ders ${q.l}</a></p>
+            <p class="qz-head"><span>Soru ${k + 1} / ${n}</span><a href="#/ders/${q.l}" target="_blank" rel="noopener" title="Ders yeni sekmede açılır, testin kaybolmaz">ders ${lno(q.l)}</a></p>
             <p class="qz-q" lang="en">${q.q}</p>
             ${q.erd ? erd(q.erd) : ''}
             ${q.multi ? '<p class="qz-hint">Birden fazla doğru şık var. Hepsini seç, sonra kontrol et.</p>' : ''}
@@ -334,7 +383,7 @@
       const keys = $$('.opt', li).filter(b => q.correct.includes(+b.dataset.o)).map(b => $('.opt-key', b).textContent).join(', ');
       const lesson = byId[q.l];
       $('.qz-fb', li).innerHTML = `<p><strong>${ok ? 'Doğru.' : `Yanlış. Doğru cevap: ${keys}.`}</strong> ${q.why}</p>`
-        + (ok ? '' : `<a href="#/ders/${q.l}" target="_blank" rel="noopener">Konuyu tekrar oku: ${q.l} ${lesson ? lesson.title : ''}</a> <small>(yeni sekmede açılır)</small>`);
+        + (ok ? '' : `<a href="#/ders/${q.l}" target="_blank" rel="noopener">Konuyu tekrar oku: ${lno(q.l)} ${lesson ? lesson.title : ''}</a> <small>(yeni sekmede açılır)</small>`);
       linkRefs($('.qz-fb p', li), null, true);
       status();
       if (Object.keys(answers).length === n) finish();
@@ -346,7 +395,7 @@
       if (!only) {
         const prevBest = scores[s.no] ? scores[s.no].best : -1;
         scores[s.no] = { best: Math.max(prevBest, right), last: right };
-        store.set('quiz', scores);
+        store.set(K('quiz'), scores);
         buildNav();
       }
       const pct = right / n;
@@ -411,7 +460,7 @@
     view.innerHTML = `
     <div class="page glossary">
       <h1>Terim sözlüğü</h1>
-      <p class="home-lead">Bütün derslerdeki ${terms.length} terim, İngilizce alfabeye göre. Bir terime tıklarsan o terimin anlatıldığı derse gidersin.</p>
+      <p class="home-lead">Bütün derslerdeki ${terms.length} terim, ${COURSE.glossaryOrder}. Bir terime tıklarsan o terimin anlatıldığı derse gidersin.</p>
       <div class="gloss-filter">
         <label class="sr" for="gq">Sözlükte ara</label>
         <input id="gq" type="search" placeholder="İngilizce ya da Türkçe yaz">
@@ -424,10 +473,10 @@
       const list = terms.filter(t => (!onlyKey || t.key) && (!q || norm(t.en + ' ' + t.tr + ' ' + t.body).includes(q)));
       let html = '', letter = '';
       list.forEach(t => {
-        const L = t.en[0].toUpperCase();
+        const L = t.en[0].toLocaleUpperCase(COURSE.locale);
         if (L !== letter) { html += `${letter ? '</dl>' : ''}<h2 class="gl-letter">${L}</h2><dl class="gl">`; letter = L; }
         html += `<div class="gl-item">
-          <dt><a href="#/ders/${t.lesson.id}?t=${t.id}"><span class="term-mark${t.key ? '' : ' plain'}" aria-hidden="true">${t.key ? '#' : '*'}</span><span lang="en">${t.en}</span></a> <span class="term-tr">${t.tr}</span> <span class="gl-lesson">ders ${t.lesson.id}</span></dt>
+          <dt><a href="#/ders/${t.lesson.id}?t=${t.id}"><span class="term-mark${t.key ? '' : ' plain'}" aria-hidden="true">${t.key ? '#' : '*'}</span><span lang="en">${t.en}</span></a> <span class="term-tr">${t.tr}</span> <span class="gl-lesson">ders ${t.lesson.no}</span></dt>
           <dd>${esc(t.body)}${t.exam[0] ? `<span class="gl-exam" lang="en">${esc(t.exam[0])}</span>` : ''}</dd>
         </div>`;
       });
@@ -454,9 +503,9 @@
     }).filter(x => x.score < 9).sort((a, b) => a.score - b.score).slice(0, 8);
     const hitsL = lessons.filter(l => norm(l.title + ' ' + l.en).includes(q)).slice(0, 3);
     let html = '';
-    hitsL.forEach(l => { html += `<a href="#/ders/${l.id}"><strong>${l.id} ${l.title}</strong><small>ders</small></a>`; });
-    hitsT.forEach(({ t }) => { html += `<a href="#/ders/${t.lesson.id}?t=${t.id}"><strong lang="en">${t.en}</strong><small>${t.tr}, ders ${t.lesson.id}</small></a>`; });
-    results.innerHTML = html || `<p class="empty">“${esc(raw)}” bulunamadı. İngilizce terimi ya da Türkçesini dene.</p>`;
+    hitsL.forEach(l => { html += `<a href="#/ders/${l.id}"><strong>${l.no} ${l.title}</strong><small>ders</small></a>`; });
+    hitsT.forEach(({ t }) => { html += `<a href="#/ders/${t.lesson.id}?t=${t.id}"><strong lang="en">${t.en}</strong><small>${t.tr}, ders ${t.lesson.no}</small></a>`; });
+    results.innerHTML = html || `<p class="empty">“${esc(raw)}” bulunamadı. Terimin Türkçesini ya da İngilizcesini dene.</p>`;
     results.hidden = false;
     sel = -1;
   }
@@ -507,6 +556,14 @@
   });
   themeLabel();
 
+  // ---------- bölüm değiştirme ----------
+  $('#deptName').textContent = COURSE.dept.replace(' bölüm', '');
+  $('#deptBtn').onclick = () => {
+    store.set('dept', null);
+    history.replaceState(null, '', '#/');
+    location.reload();
+  };
+
   // ---------- mobil menü ----------
   const sidebar = $('#sidebar');
   const mobile = () => matchMedia('(max-width: 960px)').matches;
@@ -540,26 +597,26 @@
     buildNav();
     const samePage = path === lastPath;
     lastPath = path;
-    const m = path.match(/^\/ders\/([\d-]+)/);
+    const m = path.match(/^\/ders\/([\w-]+)/);
     if (m) {
       const focus = params.get('t');
       if (samePage && focus) return flashTo(focus, 'smooth');
       window.scrollTo(0, 0);
       lessonPage(m[1], focus);
-      document.title = `${m[1]} ${byId[m[1]] ? byId[m[1]].title : ''} | Veritabanı Tasarımı`;
+      document.title = `${lno(m[1])} ${byId[m[1]] ? byId[m[1]].title : ''} | ${COURSE.name}`;
     } else if (/^\/test\/\d+$/.test(path)) {
       const no = path.split('/')[2];
       window.scrollTo(0, 0);
       testPage(no);
-      document.title = `Bölüm ${no} testi | Veritabanı Tasarımı`;
+      document.title = `${U} ${no} testi | ${COURSE.name}`;
     } else if (path.startsWith('/sozluk')) {
       window.scrollTo(0, 0);
       glossary();
-      document.title = 'Terim sözlüğü | Veritabanı Tasarımı';
+      document.title = `Terim sözlüğü | ${COURSE.name}`;
     } else {
       window.scrollTo(0, 0);
       home();
-      document.title = 'Veritabanı Tasarımı vize notları';
+      document.title = COURSE.title;
     }
     if (!samePage) view.focus({ preventScroll: true });
     const cur = $('.nav [aria-current]');
