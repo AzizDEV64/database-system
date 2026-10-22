@@ -147,24 +147,31 @@
       </header>
 
       <div class="course" aria-label="Bölümler ve dersler">
-        ${SECTIONS.map((s, i) => `
-          ${i ? '<div class="course-link" aria-hidden="true"></div>' : ''}
-          <section class="sbox">
-            <h2 class="sbox-name">${U} ${s.no}: ${s.title}</h2>
-            <p class="sbox-desc">${s.desc}</p>
-            <ul class="sbox-attrs">
-              ${s.lessons.map(l => `<li class="${done.has(l.id) ? 'done' : ''}"><a href="#/ders/${l.id}">
-                <span class="attr-mark" aria-hidden="true">${done.has(l.id) ? '✓' : ''}</span>
-                <span class="attr-id">${l.no}</span>
-                <span class="attr-name">${l.title}</span>
-                <span class="attr-min">${l.minutes} dk</span>${done.has(l.id) ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`).join('')}
-              ${s.quiz.length ? `<li class="test-row"><a href="#/test/${s.no}">
-                <span class="attr-mark" aria-hidden="true">${scores[s.no] ? '✓' : ''}</span>
-                <span class="attr-id"></span>
-                <span class="attr-name">${U} testi</span>
-                <span class="attr-min">${scoreText(s)}</span></a></li>` : ''}
+        ${SECTIONS.map(s => {
+          const n = s.lessons.filter(l => done.has(l.id)).length;
+          return `
+          <section class="stbl">
+            <div class="stbl-top">
+              <h2 class="stbl-h"><span class="stbl-tab">${U} ${s.no}</span><span class="stbl-title">${s.title}</span></h2>
+              <span class="stbl-count">${n} / ${s.lessons.length} ders</span>
+            </div>
+            <p class="stbl-desc">${s.desc}</p>
+            <ul class="stbl-rows">
+              ${s.lessons.map(l => {
+                const isDone = done.has(l.id), isNext = l === go;
+                return `<li class="${isDone ? 'done' : ''}${isNext ? ' next' : ''}"><a href="#/ders/${l.id}"${isNext ? ' aria-current="step"' : ''}>
+                <span class="row-mark" aria-hidden="true">${isDone ? '✓' : ''}</span>
+                <span class="row-id">${l.no}</span>
+                <span class="row-name">${l.title}</span>
+                <span class="row-meta">${isNext ? 'Sıradaki' : `${l.minutes} dk`}</span>${isDone ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`;
+              }).join('')}
+              ${s.quiz.length ? `<li class="test-row${scores[s.no] ? ' done' : ''}"><a href="#/test/${s.no}">
+                <span class="row-mark" aria-hidden="true">${scores[s.no] ? '✓' : '<i class="row-box"></i>'}</span>
+                <span class="row-name">${U} testi</span>
+                <span class="row-meta">${scoreText(s)}</span></a></li>` : ''}
             </ul>
-          </section>`).join('')}
+          </section>`;
+        }).join('')}
       </div>
 
       <section class="legend">
