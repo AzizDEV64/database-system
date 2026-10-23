@@ -18,6 +18,7 @@
   --box-edge: #b8902a;
   --box-ink: #2b2308;
   --box-tint: #f8e7ad;
+  --tbl: #dfe3de; --tbl-rule: #c3cac3; --tbl-muted: #535e67;
   --red: #b4372b;
   --red-tint: #f6e4df;
   --teal: #1d6889;
@@ -30,14 +31,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #161c22; --surface: #1c242b; --ink: #e5e8e2; --ink-2: #c2c9c4; --muted: #8f9aa1; --rule: #2d3841; --rule-2: #4c5a64; --control: #6d7c86; --hover: rgba(229, 232, 226, .07);
-    --box: #e3bf52; --box-2: #c99f2e; --box-edge: #f1d27a; --box-ink: #231b04; --box-tint: #3a3218;
+    --box: #e3bf52; --box-2: #c99f2e; --box-edge: #f1d27a; --box-ink: #231b04; --box-tint: #3a3218; --tbl: #27323b; --tbl-rule: #3a4752; --tbl-muted: #9ba6ad;
     --red: #f0806f; --red-tint: #33201d; --teal: #80c4e2; --teal-tint: #19303b;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #161c22; --surface: #1c242b; --ink: #e5e8e2; --ink-2: #c2c9c4; --muted: #8f9aa1; --rule: #2d3841; --rule-2: #4c5a64; --control: #6d7c86; --hover: rgba(229, 232, 226, .07);
-  --box: #e3bf52; --box-2: #c99f2e; --box-edge: #f1d27a; --box-ink: #231b04; --box-tint: #3a3218;
+  --box: #e3bf52; --box-2: #c99f2e; --box-edge: #f1d27a; --box-ink: #231b04; --box-tint: #3a3218; --tbl: #27323b; --tbl-rule: #3a4752; --tbl-muted: #9ba6ad;
   --red: #f0806f; --red-tint: #33201d; --teal: #80c4e2; --teal-tint: #19303b;
   color-scheme: dark;
 }
@@ -137,7 +138,7 @@ code { font-family: var(--mono); font-size: .86em; font-weight: 500; background:
 
 /* ---------- sayfa iskeleti ---------- */
 .view { margin-left: var(--side); outline: none; }
-.page { max-width: calc(40rem + 2 * clamp(20px, 6vw, 88px)); padding: 56px clamp(20px, 6vw, 88px) 96px; }
+.page { max-width: calc(40rem + 2 * clamp(20px, 6vw, 88px)); margin: 0 auto; padding: 56px clamp(20px, 6vw, 88px) 96px; }
 
 /* ---------- ortak: softbox ---------- */
 .sbox {
@@ -157,6 +158,7 @@ code { font-family: var(--mono); font-size: .86em; font-weight: 500; background:
 
 /* ---------- ana sayfa ---------- */
 .home-head { margin-bottom: 48px; }
+.home-head .home-lead { margin-bottom: 0; }
 .home h1, .glossary h1 {
   font-size: clamp(38px, 6vw, 60px); line-height: 1.02; letter-spacing: -.025em; font-weight: 800; margin: 0 0 20px; max-width: 12em;
 }
@@ -173,17 +175,18 @@ code { font-family: var(--mono); font-size: .86em; font-weight: 500; background:
 .course {
   display: grid; gap: 52px; margin: 0 0 72px; padding-top: 30px;
 }
-.stbl { position: relative; background: var(--surface); border: 1.5px solid var(--ink-2); border-radius: 0 10px 10px 10px; }
+.stbl { position: relative; background: var(--tbl); border: 1.5px solid var(--ink-2); border-radius: 0 10px 10px 10px; }
 .stbl-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 16px 20px 0; }
 .stbl-h { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: -.01em; font-weight: 800; }
 .stbl-tab {
   position: absolute; left: -1.5px; bottom: 100%; padding: 5px 14px 4px; border-radius: 8px 8px 0 0;
-  background: var(--ink-2); color: var(--paper); font-size: 15px; font-weight: 700; letter-spacing: 0; line-height: 1.4; white-space: nowrap;
+  background: var(--box); color: var(--box-ink); border: 1.5px solid var(--ink-2); border-bottom: 0;
+  font-size: 15px; font-weight: 800; letter-spacing: 0; line-height: 1.4; white-space: nowrap;
 }
 .stbl-count { flex: none; font-size: 14.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .stbl-desc { margin: 6px 0 0; padding: 0 20px 16px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
 .stbl-rows { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink-2); }
-.stbl-rows li + li { border-top: 1px solid var(--rule); }
+.stbl-rows li + li { border-top: 1px solid var(--tbl-rule); }
 .stbl-rows a {
   display: grid; grid-template-columns: 1.1em 2.5em 1fr auto; gap: 0 10px; align-items: baseline;
   padding: 10px 20px; color: var(--ink); text-decoration: none; line-height: 1.35;
@@ -195,8 +198,6 @@ code { font-family: var(--mono); font-size: .86em; font-weight: 500; background:
 .row-name { font-weight: 600; }
 .row-meta { font-size: 14.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .stbl-rows li.done .row-name { color: var(--ink-2); font-weight: 500; }
-.stbl-rows li.next a { background: var(--box-tint); box-shadow: inset 4px 0 0 var(--box-2); }
-.stbl-rows li.next .row-meta { color: var(--ink); font-weight: 700; }
 .stbl-rows .test-row { border-top: 1.5px solid var(--ink-2) !important; }
 .stbl-rows .test-row a { grid-template-columns: 1.1em 1fr auto; border-radius: 0 0 9px 9px; }
 .row-box { display: inline-block; width: 11px; height: 11px; border: 1.5px solid var(--ink-2); border-radius: 2px; vertical-align: -1px; }
@@ -606,20 +607,42 @@ body.quick .content h2 { margin-top: 40px; }
 /* ---------- bölüm seçimi ---------- */
 .choosing .sidebar, .choosing .mobilebar, .choosing .scrim { display: none; }
 .choosing .view { margin-left: 0; }
-.chooser { margin: 0 auto; max-width: 52rem; padding-top: clamp(40px, 10vh, 120px); }
-.chooser h1 { font-size: clamp(36px, 6vw, 58px); line-height: 1.04; letter-spacing: -.025em; font-weight: 800; margin: 0 0 16px; }
-.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
-.choice {
-  display: flex; flex-direction: column; gap: 6px; text-align: left; font: inherit; cursor: pointer;
-  padding: 22px 22px 20px; transition: transform .15s, box-shadow .15s;
+.chooser { margin: 0 auto; max-width: calc(50rem + 2 * clamp(20px, 6vw, 88px)); padding-top: clamp(40px, 9vh, 104px); }
+.chooser-brand { display: flex; align-items: center; gap: 10px; margin: 0 0 28px; font-size: 16.5px; font-weight: 800; letter-spacing: -.01em; }
+.chooser h1 { font-size: clamp(38px, 6vw, 60px); line-height: 1.02; letter-spacing: -.025em; font-weight: 800; margin: 0 0 18px; }
+.chooser .home-lead { margin-bottom: 0; }
+/* iki bölüm yan yana (bu sayfada kullanıcı yan yana istedi), telefonda alt alta.
+   Kutu: gri gövde, sarı sekme, sarı seçme satırı. Kutunun her yeri tıklanır (düğme kutuyu kaplar). */
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; }
+.dchoice {
+  position: relative; display: flex; flex-direction: column; cursor: pointer;
+  background: var(--tbl); border: 1.5px solid var(--ink-2); border-radius: 0 10px 10px 10px;
 }
-.choice:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(20, 30, 40, .16); }
-.choice:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-.choice-name { font-size: 26px; font-weight: 800; letter-spacing: -.015em; line-height: 1.15; }
-.choice-course { font-size: 16px; font-weight: 600; opacity: .85; }
-.choice-desc { font-size: 16px; line-height: 1.5; margin-top: 8px; }
-.choice-meta { margin-top: 14px; padding-top: 10px; border-top: 1.5px solid var(--box-edge); font-size: 14.5px; font-weight: 600; opacity: .8; }
-@media (max-width: 640px) { .choices { grid-template-columns: 1fr; } }
+.dchoice:hover, .dchoice:focus-within { border-color: var(--ink); }
+.dchoice-h { margin: 0; padding: 18px 20px 0; font-size: 21px; line-height: 1.25; letter-spacing: -.01em; font-weight: 800; }
+.dchoice-tab {
+  position: absolute; left: -1.5px; bottom: 100%; padding: 5px 14px 4px; border-radius: 8px 8px 0 0;
+  background: var(--box); color: var(--box-ink); border: 1.5px solid var(--ink-2); border-bottom: 0;
+  font-size: 15px; font-weight: 800; line-height: 1.4; white-space: nowrap;
+}
+.dchoice:hover .dchoice-tab, .dchoice:focus-within .dchoice-tab { border-color: var(--ink); }
+.dchoice-title { display: block; }
+.dchoice-desc { flex: 1; margin: 8px 0 0; padding: 0 20px; font-size: 16px; line-height: 1.5; color: var(--ink-2); }
+.dchoice-count { margin: 14px 0 0; padding: 0 20px 16px; font-size: 14.5px; font-weight: 600; color: var(--muted); }
+.dchoice-go {
+  display: block; width: 100%; text-align: left; font: inherit; font-weight: 800; font-size: 17px; line-height: 1.3; cursor: pointer;
+  color: var(--ink); background: var(--box-tint); border: 0; border-top: 1.5px solid var(--ink-2); border-radius: 0 0 9px 9px; padding: 13px 20px;
+}
+.dchoice-go::after { content: ""; position: absolute; inset: 0; }
+.dchoice:hover .dchoice-go, .dchoice-go:focus-visible { background: var(--box); color: var(--box-ink); }
+.dchoice-go:focus-visible { outline: none; }
+.dchoice:has(.dchoice-go:focus-visible) { outline: 3px solid var(--teal); outline-offset: 4px; }
+@media (max-width: 720px) {
+  .choices { grid-template-columns: 1fr; gap: 52px; margin-top: 52px; }
+  .dchoice-h { padding: 16px 16px 0; font-size: 19px; }
+  .dchoice-desc, .dchoice-count { padding-left: 16px; padding-right: 16px; }
+  .dchoice-go { padding: 13px 16px; }
+}
 
 /* menü altındaki bölüm satırı */
 .dept-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); color: var(--ink-2); }
@@ -720,3 +743,21 @@ td .chen-cell + small { display: block; margin-top: 2px; font-size: 13px; color:
 .figure > .look-note { margin-top: 12px !important; }
 .ch-ent.ch-hl, .ch-attr.ch-hl, .ch-rel.ch-hl { stroke: var(--red); stroke-width: 2.4; }
 .ch-line.ch-hl { stroke: var(--red); stroke-width: 2.2; }
+
+/* gri tablo zemininde ikincil yazılar biraz koyu olsun (okunurluk) */
+.stbl .stbl-count, .stbl .row-id, .stbl .row-meta, .dchoice-count { color: var(--tbl-muted); }
+
+/* kenar menü temadan bağımsız hep koyu (kullanıcı istedi): koyu tema renkleri menünün içinde yeniden tanımlanır.
+   Zemin sitenin lacivert mürekkep rengi; koyu temada sayfadan biraz açık kalır. */
+.sidebar {
+  --paper: #1d2730; --surface: #26323c; --ink: #e5e8e2; --ink-2: #c2c9c4; --muted: #95a0a7; --rule: #34424d; --rule-2: #52616b; --control: #6d7c86; --hover: rgba(229, 232, 226, .08);
+  --box: #e3bf52; --box-2: #c99f2e; --box-edge: #f1d27a; --box-ink: #231b04; --box-tint: #3d3519;
+  --red: #f0806f; --red-tint: #33201d; --teal: #80c4e2; --teal-tint: #19303b;
+  color-scheme: dark; background: var(--paper); color: var(--ink); border-right-color: #1d2730;
+}
+
+/* geniş ekran: sütun menünün sağındaki alanın ortasında durur (.page margin: auto).
+   Çok geniş ekranda bütün site (menü dahil) birlikte büyür; satır uzunluğu (karakter sayısı) değişmez. */
+@media (min-width: 1600px) { html { zoom: 1.1; } }
+@media (min-width: 1900px) { html { zoom: 1.2; } }
+@media (min-width: 2400px) { html { zoom: 1.35; } }

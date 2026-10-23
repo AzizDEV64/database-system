@@ -26,21 +26,27 @@
       const tests = secs.filter(s => (c.quizzes[s.no] || []).length).length;
       return `${secs.length} ${c.unit.toLocaleLowerCase('tr')}, ${n} ders, ${tests} test`;
     };
+    const desc = {
+      en: 'Konular Türkçe anlatılıyor. Sınav İngilizce olduğu için her terimin yanında sınavda geçen İngilizce ifade var, bölüm sonundaki testler de İngilizce.',
+      tr: 'Konular da testler de Türkçe. Her terimin yanında İngilizce karşılığı da yazıyor.',
+    };
+    // her bölüm sekmeli bir tablo kutusu: gri gövde, sarı sekme ve sarı seçme satırı
     view.innerHTML = `
     <div class="page chooser">
+      <p class="chooser-brand"><span class="brand-mark" aria-hidden="true">${$('.brand-mark').innerHTML}</span>Veritabanı vize notları</p>
       <h1>Hangi bölümdesin?</h1>
-      <p class="home-lead">Bölümüne göre kendi dersinin notlarını ve testlerini göreceksin. Seçimini bu tarayıcı hatırlar; istersen sonra menünün altından değiştirebilirsin.</p>
+      <p class="home-lead">Bu ders üniversitede iki ayrı bölümde, farklı içerikle işleniyor. Kendi bölümünü seç; seçimini bu tarayıcı hatırlar, istersen sonra menünün altından değiştirebilirsin.</p>
       <div class="choices">
         ${['en', 'tr'].map(k => { const c = window.COURSES[k]; return `
-        <button class="sbox choice" type="button" data-dept="${k}">
-          <span class="choice-name">${c.dept}</span>
-          <span class="choice-course">${c.source}</span>
-          <span class="choice-desc">${k === 'en' ? 'Türkçe anlatım, sınav için İngilizce terimler ve İngilizce testler.' : 'Türkçe anlatım ve Türkçe testler. Terimlerin İngilizcesi de yanında.'}</span>
-          <span class="choice-meta">${info(c)}</span>
-        </button>`; }).join('')}
+        <section class="dchoice" aria-labelledby="dc-${k}">
+          <h2 class="dchoice-h" id="dc-${k}"><span class="dchoice-tab">${c.dept}</span><span class="dchoice-title">${c.source}</span></h2>
+          <p class="dchoice-desc">${desc[k]}</p>
+          <p class="dchoice-count">${info(c)}</p>
+          <button class="dchoice-go" type="button" data-dept="${k}">${c.dept.replace(' bölüm', ' bölümü')} seç</button>
+        </section>`; }).join('')}
       </div>
     </div>`;
-    $$('.choice', view).forEach(b => {
+    $$('.dchoice-go', view).forEach(b => {
       b.onclick = () => { store.set('dept', b.dataset.dept); location.reload(); };
     });
   }
@@ -133,17 +139,11 @@
 
   // ---------- ana sayfa ----------
   function home() {
-    const last = byId[store.get(K('last'), '')];
-    const firstOpen = lessons.find(l => !done.has(l.id)) || lessons[0];
-    const go = last && !done.has(last.id) ? last : firstOpen;
-    const cta = done.size || last ? `Kaldığın yerden devam et: ${go.no} ${go.title}` : `Başla: ${go.no} ${go.title}`;
-
     view.innerHTML = `
     <div class="page home">
       <header class="home-head">
         <h1>${COURSE.title}</h1>
         <p class="home-lead">${COURSE.lead}</p>
-        <a class="btn" href="#/ders/${go.id}">${cta}</a>
       </header>
 
       <div class="course" aria-label="Bölümler ve dersler">
@@ -158,12 +158,12 @@
             <p class="stbl-desc">${s.desc}</p>
             <ul class="stbl-rows">
               ${s.lessons.map(l => {
-                const isDone = done.has(l.id), isNext = l === go;
-                return `<li class="${isDone ? 'done' : ''}${isNext ? ' next' : ''}"><a href="#/ders/${l.id}"${isNext ? ' aria-current="step"' : ''}>
+                const isDone = done.has(l.id);
+                return `<li class="${isDone ? 'done' : ''}"><a href="#/ders/${l.id}">
                 <span class="row-mark" aria-hidden="true">${isDone ? '✓' : ''}</span>
                 <span class="row-id">${l.no}</span>
                 <span class="row-name">${l.title}</span>
-                <span class="row-meta">${isNext ? 'Sıradaki' : `${l.minutes} dk`}</span>${isDone ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`;
+                <span class="row-meta">${l.minutes} dk</span>${isDone ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`;
               }).join('')}
               ${s.quiz.length ? `<li class="test-row${scores[s.no] ? ' done' : ''}"><a href="#/test/${s.no}">
                 <span class="row-mark" aria-hidden="true">${scores[s.no] ? '✓' : '<i class="row-box"></i>'}</span>
