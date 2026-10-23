@@ -584,7 +584,7 @@
     view.inert = open;                 // menü açıkken arkadaki sayfaya odak gitmesin
     // odağı arama kutusuna değil menüye ver: telefonda ekran klavyesi açılmasın
     if (open) ($('.nav [aria-current]') || sidebar).focus({ preventScroll: true });
-    else if (sidebar.contains(document.activeElement) || document.activeElement === document.body) $('#menuBtn').focus();
+    else if (sidebar.contains(document.activeElement) || document.activeElement === document.body) $('#menuBtn').focus({ preventScroll: true });
   }
   $('#menuBtn').onclick = () => toggleMenu(!document.body.classList.contains('menu-open'));
   $('#scrim').onclick = () => toggleMenu(false);

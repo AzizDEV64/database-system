@@ -428,6 +428,9 @@ td.diag { background: repeating-linear-gradient(135deg, var(--rule) 0 1px, trans
   .menu-open .sidebar { transform: none; visibility: visible; transition: transform .22s ease; box-shadow: 0 0 40px rgba(0, 0, 0, .25); }
   .scrim { display: block; position: fixed; inset: 0; z-index: 35; background: rgba(15, 20, 25, .45); opacity: 0; pointer-events: none; transition: opacity .22s; }
   .menu-open .scrim { opacity: 1; pointer-events: auto; }
+  /* menü açıkken arkadaki sayfa kaymasın; menü listesi sona gelince kaydırma sayfaya geçmesin */
+  html:has(body.menu-open), body.menu-open { overflow: hidden; }
+  .sidebar, .nav { overscroll-behavior: contain; }
   .view { margin-left: 0; }
   .page { padding-top: 32px; }
   .search kbd { display: none; }
