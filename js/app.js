@@ -201,9 +201,6 @@
       <header class="sbox lesson-box">
         <h1><span class="lesson-id">${l.no}</span>${l.title}</h1>
         <p class="lesson-en" lang="en">${l.en}</p>
-        <ul class="sbox-attrs term-index" aria-label="Bu dersteki terimler">
-          ${l.terms.map(t => `<li><a href="#/ders/${id}?t=${t.id}"><span class="attr-mark" aria-hidden="true">${t.key ? '#' : '*'}</span><span class="attr-name" lang="en">${t.en}</span><span class="attr-tr">${t.tr}</span></a></li>`).join('')}
-        </ul>
       </header>
       <div class="lesson-meta"><p>Yaklaşık ${l.minutes} dakikada okunur, ${l.terms.length} terim var.</p><button class="quick-toggle" id="quickBtn" type="button" aria-pressed="${quick}"><span class="qt-track" aria-hidden="true"></span><span class="qt-text">Hızlı tekrar<small>sadece terim, Türkçesi ve sınav cümlesi</small></span></button></div>
       <div class="content">${l.html}</div>
