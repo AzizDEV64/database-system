@@ -18,7 +18,7 @@ window.COURSES = {
     lead: 'Oracle Academy “Database Design” dersinin Türkçe özeti. Her İngilizce terimin ne demek olduğunu sade bir dille anlatıyor, sınavda karşına çıkacak İngilizce ifadeyi de yanına yazıyor. Her bölümün sonunda, sınavdaki gibi İngilizce bir test var.',
     examTag: 'Sınavda',
     examLegend: 'Sınavda geçen İngilizce ifade. Sınav İngilizce olduğu için bunu tanıman lazım; zor kelimelerin Türkçesi parantez içinde.',
-    scope: '1-1 (Oracle Academy tanıtımı, maaşlar, sertifikalar) veritabanı konusu içermediği için alınmadı. 7. ve 8. bölümler şu an sitede yok.',
+    scope: '1-1 (Oracle Academy tanıtımı, maaşlar, sertifikalar) veritabanı konusu içermediği için alınmadı. 7. ve 8. bölümler şu an sitede yok. En sondaki “Ek” bölümü, SQL ile tablo oluşturmayı (CREATE TABLE) anlatan ek derstir.',
     quizLang: 'İngilizce',
     quizSub: n => `Section ${n} quiz`,
     tf: ['True', 'False'],
@@ -81,7 +81,7 @@ function more(html) {
 const tterm = (tr, en, body, o = {}) => term(tr, en, body, Object.assign({}, o, { exam: undefined, cls: 'tterm' }));
 
 // SQL kodu: anahtar kelimeler, metinler ve yorumlar renklendirilir
-const SQL_KW = 'CREATE|DATABASE|SCHEMA|TABLE|ALTER|ADD|DROP|COLUMN|MODIFY|TYPE|CONSTRAINT|PRIMARY|FOREIGN|KEY|REFERENCES|UNIQUE|CHECK|NOT|NULL|DEFAULT|SET|USING|EXTRACT|FROM|SELECT|WHERE|ORDER|BY|ASC|DESC|AND|OR|ENCODING|LC_COLLATE|LC_CTYPE|OWNER|TEMPLATE';
+const SQL_KW = 'CREATE|DATABASE|SCHEMA|TABLE|ALTER|ADD|DROP|COLUMN|MODIFY|TYPE|CONSTRAINT|PRIMARY|FOREIGN|KEY|REFERENCES|UNIQUE|CHECK|NOT|NULL|DEFAULT|SET|USING|EXTRACT|FROM|SELECT|WHERE|ORDER|BY|ASC|DESC|AND|OR|AS|INTO|INSERT|ENCODING|LC_COLLATE|LC_CTYPE|OWNER|TEMPLATE';
 function sql(code, caption) {
   const esc = code.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const re = new RegExp(`(--[^\\n]*)|('[^']*')|("[^"]*")|\\b(${SQL_KW})\\b`, 'g');

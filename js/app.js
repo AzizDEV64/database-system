@@ -62,6 +62,8 @@
   // ---------- veri ----------
   const lessons = [];
   SECTIONS.sort((a, b) => a.no - b.no).forEach(s => s.lessons.forEach(l => { l.section = s; lessons.push(l); }));
+  // ekranda görünen bölüm adı: numarasız bölümlerde (ör. "Ek") label kullanılır, adres yine numarayla kalır
+  SECTIONS.forEach(s => { s.name = s.label || `${U} ${s.no}`; s.testName = `${s.label || U} testi`; });
   const byId = Object.fromEntries(lessons.map(l => [l.id, l]));
   // ekranda görünen ders numarası: aynı numaralı iki ders olabilir (Türkçe bölümde iki tane H4), adresleri farklıdır
   lessons.forEach(l => { l.no = l.label || l.id; });
@@ -99,7 +101,7 @@
   SECTIONS.forEach(s => {
     s.quiz = QUIZZES[s.no] || [];
     s.lessons.forEach(l => pages.push({ href: '#/ders/' + l.id, label: l.no + ' ' + l.title, kind: 'ders' }));
-    if (s.quiz.length) pages.push({ href: '#/test/' + s.no, label: U + ' ' + s.no + ' testi', kind: 'test' });
+    if (s.quiz.length) pages.push({ href: '#/test/' + s.no, label: s.name + ' testi', kind: 'test' });
   });
   const pageIndex = path => pages.findIndex(p => p.href === '#' + path);
   const scoreText = s => scores[s.no] ? `${scores[s.no].best} / ${s.quiz.length}` : `${s.quiz.length} soru`;
@@ -112,7 +114,7 @@
       <li><a href="#/sozluk"${route.startsWith('#/sozluk') ? ' aria-current="page"' : ''}>Terim sözlüğü</a></li>
     </ul>`;
     SECTIONS.forEach(s => {
-      html += `<p class="nav-section">${U} ${s.no}: ${s.title}</p><ol class="rail">`;
+      html += `<p class="nav-section">${s.name}: ${s.title}</p><ol class="rail">`;
       s.lessons.forEach(l => {
         const cur = route.startsWith('#/ders/' + l.id);
         html += `<li class="${done.has(l.id) ? 'done' : ''}"><a href="#/ders/${l.id}"${cur ? ' aria-current="page"' : ''}>
@@ -121,7 +123,7 @@
       if (s.quiz.length) {
         const cur = route.startsWith('#/test/' + s.no);
         html += `<li class="test${scores[s.no] ? ' done' : ''}"><a href="#/test/${s.no}"${cur ? ' aria-current="page"' : ''}>
-          <span class="rail-id"></span><span>${U} testi</span><span class="rail-score">${scoreText(s)}</span></a></li>`;
+          <span class="rail-id"></span><span>${s.testName}</span><span class="rail-score">${scoreText(s)}</span></a></li>`;
       }
       html += `</ol>`;
     });
@@ -152,7 +154,7 @@
           return `
           <section class="stbl">
             <div class="stbl-top">
-              <h2 class="stbl-h"><span class="stbl-tab">${U} ${s.no}</span><span class="stbl-title">${s.title}</span></h2>
+              <h2 class="stbl-h"><span class="stbl-tab">${s.name}</span><span class="stbl-title">${s.title}</span></h2>
               <span class="stbl-count">${n} / ${s.lessons.length} ders</span>
             </div>
             <p class="stbl-desc">${s.desc}</p>
@@ -167,7 +169,7 @@
               }).join('')}
               ${s.quiz.length ? `<li class="test-row${scores[s.no] ? ' done' : ''}"><a href="#/test/${s.no}">
                 <span class="row-mark" aria-hidden="true">${scores[s.no] ? '✓' : '<i class="row-box"></i>'}</span>
-                <span class="row-name">${U} testi</span>
+                <span class="row-name">${s.testName}</span>
                 <span class="row-meta">${scoreText(s)}</span></a></li>` : ''}
             </ul>
           </section>`;
@@ -197,7 +199,7 @@
 
     view.innerHTML = `
     <article class="page lesson">
-      <p class="crumbs"><a href="#/">Ana sayfa</a> / ${U} ${l.section.no}: ${l.section.title}</p>
+      <p class="crumbs"><a href="#/">Ana sayfa</a> / ${l.section.name}: ${l.section.title}</p>
       <header class="sbox lesson-box">
         <h1><span class="lesson-id">${l.no}</span>${l.title}</h1>
         <p class="lesson-en" lang="en">${l.en}</p>
@@ -325,10 +327,10 @@
 
     view.innerHTML = `
     <article class="page test">
-      <p class="crumbs"><a href="#/">Ana sayfa</a> / ${U} ${s.no}: ${s.title}</p>
+      <p class="crumbs"><a href="#/">Ana sayfa</a> / ${s.name}: ${s.title}</p>
       <header class="sbox lesson-box">
-        <h1><span class="lesson-id">${U} ${s.no}</span>${U} testi</h1>
-        <p class="lesson-en">${COURSE.quizSub(s.no)}</p>
+        <h1><span class="lesson-id">${s.name}</span>${s.testName}</h1>
+        <p class="lesson-en">${s.quizSub || COURSE.quizSub(s.no)}</p>
         <ul class="sbox-attrs term-index" aria-label="Testin kapsadığı dersler">
           ${s.lessons.map(l => `<li><a href="#/ders/${l.id}"><span class="attr-mark" aria-hidden="true">*</span><span class="attr-name">${l.no} ${l.title}</span></a></li>`).join('')}
         </ul>
@@ -612,7 +614,7 @@
       const no = path.split('/')[2];
       window.scrollTo(0, 0);
       testPage(no);
-      document.title = `${U} ${no} testi | ${COURSE.name}`;
+      document.title = `${(SECTIONS.find(s => String(s.no) === no) || {}).name} testi | ${COURSE.name}`;
     } else if (path.startsWith('/sozluk')) {
       window.scrollTo(0, 0);
       glossary();
