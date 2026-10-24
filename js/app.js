@@ -116,12 +116,12 @@
     SECTIONS.forEach(s => {
       html += `<p class="nav-section">${s.name}: ${s.title}</p><ol class="rail">`;
       s.lessons.forEach(l => {
-        const cur = route.startsWith('#/ders/' + l.id);
+        const cur = route === '#/ders/' + l.id || route.startsWith('#/ders/' + l.id + '?');
         html += `<li class="${done.has(l.id) ? 'done' : ''}"><a href="#/ders/${l.id}"${cur ? ' aria-current="page"' : ''}>
           <span class="rail-id">${l.no}</span><span>${l.title}</span>${done.has(l.id) ? '<span class="sr"> (bitti)</span>' : ''}</a></li>`;
       });
       if (s.quiz.length) {
-        const cur = route.startsWith('#/test/' + s.no);
+        const cur = route === '#/test/' + s.no;
         html += `<li class="test${scores[s.no] ? ' done' : ''}"><a href="#/test/${s.no}"${cur ? ' aria-current="page"' : ''}>
           <span class="rail-id"></span><span>${s.testName}</span><span class="rail-score">${scoreText(s)}</span></a></li>`;
       }
@@ -203,6 +203,7 @@
       <header class="sbox lesson-box">
         <h1><span class="lesson-id">${l.no}</span>${l.title}</h1>
         <p class="lesson-en" lang="en">${l.en}</p>
+        ${l.section.source ? `<p class="lesson-source">${l.section.source}</p>` : ''}
       </header>
       <div class="lesson-meta"><p>Yaklaşık ${l.minutes} dakikada okunur, ${l.terms.length} terim var.</p><button class="quick-toggle" id="quickBtn" type="button" aria-pressed="${quick}"><span class="qt-track" aria-hidden="true"></span><span class="qt-text">Hızlı tekrar<small>sadece terim, Türkçesi ve sınav cümlesi</small></span></button></div>
       <div class="content">${l.html}</div>
@@ -331,6 +332,7 @@
       <header class="sbox lesson-box">
         <h1><span class="lesson-id">${s.name}</span>${s.testName}</h1>
         <p class="lesson-en">${s.quizSub || COURSE.quizSub(s.no)}</p>
+        ${s.source ? `<p class="lesson-source">${s.source}</p>` : ''}
         <ul class="sbox-attrs term-index" aria-label="Testin kapsadığı dersler">
           ${s.lessons.map(l => `<li><a href="#/ders/${l.id}"><span class="attr-mark" aria-hidden="true">*</span><span class="attr-name">${l.no} ${l.title}</span></a></li>`).join('')}
         </ul>

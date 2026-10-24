@@ -8,7 +8,9 @@ SECTIONS.push({
   title: 'SQL ile tablo oluşturma',
   en: 'Creating tables with SQL',
   quizSub: 'CREATE TABLE quiz',
-  desc: 'CREATE TABLE komutuyla yeni bir tablonun yapısını tanımlamayı, metin, sayı ve tarih veri tiplerini, PRIMARY KEY ve NOT NULL kısıtlarını öğreneceksin.',
+  // ders ve test başlık kutusunda görünür
+  source: 'Bu ders Oracle Academy’de yok; hocanın kampüs sistemine yüklediği ek derstir.',
+  desc: 'Hocanın Oracle Academy’ye değil, kampüs sistemine yüklediği ek ders. CREATE TABLE komutuyla yeni bir tablonun yapısını tanımlamayı, veri tiplerini, PRIMARY KEY ve NOT NULL kısıtlarını öğreneceksin.',
   lessons: [
     {
       id: 'ek',

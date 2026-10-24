@@ -228,6 +228,8 @@ code { font-family: var(--mono); font-size: .86em; font-weight: 500; background:
 .lesson-box h1 { margin: 0; font-size: clamp(30px, 4.4vw, 42px); line-height: 1.08; letter-spacing: -.022em; font-weight: 800; }
 .lesson-id { display: block; font-size: 18px; font-weight: 600; letter-spacing: 0; margin-bottom: 4px; opacity: .7; }
 .lesson-en { margin: 8px 0 0; font-style: italic; font-size: 19px; opacity: .82; }
+/* dersin kaynağı farklıysa (ör. Ek bölümü) başlık kutusunda kısa bir satır */
+.lesson-source { margin: 14px 0 0; padding-top: 12px; border-top: 1.5px solid var(--box-edge); font-size: 16.5px; font-weight: 600; line-height: 1.45; }
 .term-index { columns: 2; column-gap: 28px; }
 .term-index a { display: block; padding-left: 1.6em; text-indent: -1.6em; }
 .term-index .attr-mark { display: inline-block; width: 1.6em; text-indent: 0; }

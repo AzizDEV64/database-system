@@ -18,7 +18,7 @@ window.COURSES = {
     lead: 'Oracle Academy “Database Design” dersinin Türkçe özeti. Her İngilizce terimin ne demek olduğunu sade bir dille anlatıyor, sınavda karşına çıkacak İngilizce ifadeyi de yanına yazıyor. Her bölümün sonunda, sınavdaki gibi İngilizce bir test var.',
     examTag: 'Sınavda',
     examLegend: 'Sınavda geçen İngilizce ifade. Sınav İngilizce olduğu için bunu tanıman lazım; zor kelimelerin Türkçesi parantez içinde.',
-    scope: '1-1 (Oracle Academy tanıtımı, maaşlar, sertifikalar) veritabanı konusu içermediği için alınmadı. 7. ve 8. bölümler şu an sitede yok. En sondaki “Ek” bölümü, SQL ile tablo oluşturmayı (CREATE TABLE) anlatan ek derstir.',
+    scope: '1-1 (Oracle Academy tanıtımı, maaşlar, sertifikalar) veritabanı konusu içermediği için alınmadı. 7. ve 8. bölümler şu an sitede yok. En sondaki “Ek” bölümü Oracle Academy’den değil, hocanın kampüs sistemine yüklediği SQL ile tablo oluşturma (CREATE TABLE) dersidir.',
     quizLang: 'İngilizce',
     quizSub: n => `Section ${n} quiz`,
     tf: ['True', 'False'],
